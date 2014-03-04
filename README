@@ -1,0 +1,63 @@
+Author: Joseph Toles
+Date : August 16, 2013
+
+
++——————————————————————+
+| Sections             |
++——————————————————————+
+1. Install drivers
+2. Notes
+
+
++——————————————————————+
+| 1  INSTALL DRIVERS   |
++——————————————————————+
+This section explains how to install the drivers necessary to run this program.
+
+Plug the LabJack into the computer using the USB cable.
+
+Go to http://labjack.com/support/u3 and click “Linux Package”. This will download a compressed folder called “exodriver-master”. Extract it. Open the extracted folder. There are instructions in the “README” and “INSTALL.Linux” files but you don’t need them. Follow these instructions to install the drivers.
+
+Once you have installed the drivers, go into exodriver-master’s “examples/u3” folder. Enter the “make” command. Run “u3EFunctions”. If it works you’re ready to go.
+
+
++——————————————————————+
+| 2  MISC NOTES        |
++——————————————————————+
+This section lists useful information.
+
+The U3 Labjack manual can be found at
+http://labjack.com/support/u3
+
+Information on temperature coefficients can be foudn at
+http://en.wikipedia.org/wiki/Temperature_coefficient
+	R(T)  = R(T_0)(1+alpha(T_1-T_0))
+	T_0   = 100 ohms @ 0°C
+	alpha = 0.00385 °C^-1
+The LabJack does not actually read voltages at 0.000V. It only goes down to 0.003V. So I will use and idealized range of
+
+The pressure sensor we use is of the following make
+	SSI Technologies Inc
+	P51-200-A-E-I36-5V-000-000
+Information on the pressure sensor can be found at
+http://www.digikey.com/product-detail/en/P51-200-A-E-I36-5V-000-000/734-1184-ND/1720107
+
+
+
+CALIBRATION NOTES
+
+0.000V at 18 ohms
+and
+2.400V at 118 ohms
+
+This means that Voltage = 0.005V + 2.400V(resistance-18)/100
+
+But the actual test resistances I'm using are 116.0 (varies between 115.9 and 116.2 ohms) and 18.0 (varies between 17.8 and 18.3) ohms
+so the voltages I should look for are
+
+0.005V at 18.0 ohms
+and
+2.357V at 116.0 ohms
+
+
+
