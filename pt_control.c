@@ -17,6 +17,7 @@ double kelvin(double v);
 int main(int argc, char **argv);
 double resistance(double voltage);
 double temperature(double resistance);
+double pressure(double voltage);
 
 //CONSTANTS
 static const int UPDATES_PER_SECOND = 10;
@@ -69,9 +70,10 @@ int main(int argc, char **argv)
 		for(int channel = 0; channel < 4; ++channel)
 			printf("  %5.1f", temperature(resistance(voltages[channel])));
 		printf("\n");
+		printf("Pressure  (PsI)                    %5.1f\n", pressure(voltages[channel]));
 		clock_t goal = CLOCKS_PER_SEC/UPDATES_PER_SECOND + clock();
 		while (goal > clock());
-		for(int i=0; i<3; ++i)
+		for(int i=0; i<4; ++i)
 	    		fputs("\033[A\033[2K",stdout);
 		configIO = 0;
 	}
@@ -93,4 +95,9 @@ double temperature(double resistance)
 {
 	//approximate, still needs fine tuning
 	return 72.0+(320.0-72.0)*(resistance-18.0)/100.0 ;
+}
+
+double pressure(double voltage)
+{
+	return 200.0*(voltage-1.0)/4.0;
 }
