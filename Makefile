@@ -20,4 +20,4 @@ pt_control: $(PT_CONTROL_OBJ) $(HDRS)
 	$(CC) -o run $(CFLAGS) $(PT_CONTROL_OBJ) $(LDFLAGS) $(LIBS)
 
 clean:
-	rm -f *.o *~ pt_control
+	rm -f *.o run *~ pt_control
