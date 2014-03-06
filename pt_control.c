@@ -70,7 +70,7 @@ int main(int argc, char **argv)
 		for(int channel = 0; channel < 4; ++channel)
 			printf("  %5.1f", temperature(resistance(voltages[channel], channel)));
 		printf("\n");
-		printf("Pressure  (PSI)						   %5.1f\n", pressure(voltages[7]));
+		printf("Pressure  (PSI)                                                   %5.1f\n", pressure(voltages[7]));
 		clock_t goal = CLOCKS_PER_SEC/UPDATES_PER_SECOND + clock();
 		while (goal > clock());
 		for(int i=0; i<4; ++i)
@@ -103,6 +103,18 @@ double resistance(double voltage, int channel)
 		v1 = 1.692;
 		r1 = 90.3;
 		return (voltage-v0)*(r1-r0)/(v1-v0)+r0;
+	case 2:; //NOT CALIBRATED
+		v0 = 0.091;
+		r0 = 20.8;
+		v1 = 1.692;
+		r1 = 90.3;
+		return (voltage-v0)*(r1-r0)/(v1-v0)+r0;
+	case 3:; //NOT CALIBRATED
+		v0 = 0.091;
+		r0 = 20.8;
+		v1 = 1.692;
+		r1 = 90.3;
+		return (voltage-v0)*(r1-r0)/(v1-v0)+r0;
 	default:
 		break;
 	}
@@ -112,7 +124,13 @@ double resistance(double voltage, int channel)
 double temperature(double resistance)
 {
 	//approximate, still needs fine tuning
-	return 72.0+(320.0-72.0)*(resistance-18.0)/100.0 ;
+	//return 72.0+(320.0-72.0)*(resistance-18.0)/100.0 ;
+	double r0,r1,t0,t1;
+	r0 = 17.11;
+	r1 = 118.19;
+	t0 = 70;
+	t1 = 320.0;
+	return t0+resistance*(r1-r0)/(t1-t0);
 }
 
 double pressure(double voltage)
