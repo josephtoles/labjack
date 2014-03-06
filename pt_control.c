@@ -73,7 +73,7 @@ int main(int argc, char **argv)
 		printf("\n");
 		printf("Temperature (C)");
 		for(int channel = 0; channel < 4; ++channel)
-			printf("  %5.1f", temperature(resistance(voltages[channel], channel))+KELVIN+TO+CELCIUS);
+			printf("  %5.1f", temperature(resistance(voltages[channel], channel))+KELVIN_TO_CELCIUS);
 		printf("\n");
 		printf("Pressure  (PSI)                                                   %5.1f\n", pressure(voltages[7]));
 		clock_t goal = CLOCKS_PER_SEC/UPDATES_PER_SECOND + clock();
