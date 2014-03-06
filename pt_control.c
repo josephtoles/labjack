@@ -15,7 +15,7 @@
 void close_connection();
 double kelvin(double v);
 int main(int argc, char **argv);
-double resistance(double voltage);
+double resistance(double voltage, int channel);
 double temperature(double resistance);
 double pressure(double voltage);
 
@@ -49,7 +49,7 @@ int main(int argc, char **argv)
 	//read voltages
 	int configIO = 1;
 	double voltages[NUM_CHANNELS];
-	printf("             ");
+	printf("	     ");
 	for(int i=0; i<NUM_CHANNELS; ++i)
 		printf("    Ch%d", i);
 	printf("\n");
@@ -64,13 +64,13 @@ int main(int argc, char **argv)
     		printf("\n");
 		printf("Resistance  (\u03a9)");
 		for(int channel = 0; channel < 4; ++channel)
-			printf("  %5.1f", resistance(voltages[channel]));
+			printf("  %5.1f", resistance(voltages[channel], channel));
 		printf("\n");
 		printf("Temperature (K)");
 		for(int channel = 0; channel < 4; ++channel)
-			printf("  %5.1f", temperature(resistance(voltages[channel])));
+			printf("  %5.1f", temperature(resistance(voltages[channel], channel)));
 		printf("\n");
-		printf("Pressure  (PsI)                                                   %5.1f\n", pressure(voltages[7]));
+		printf("Pressure  (PSI)						   %5.1f\n", pressure(voltages[7]));
 		clock_t goal = CLOCKS_PER_SEC/UPDATES_PER_SECOND + clock();
 		while (goal > clock());
 		for(int i=0; i<4; ++i)
@@ -86,8 +86,26 @@ close:
     return 0;
 }
 
-double resistance(double voltage)
+double resistance(double voltage, int channel)
 {
+	double v0,v1,r0,r1;
+	switch(channel)
+	{
+	case 0:;
+		v0 = 0.087;
+		r0 = 20.8;
+		v1 = 1.694;
+		r1 = 90.3;
+		return (voltage-v0)*(r1-r0)/(v1-v0)+r0;
+	case 1:;
+		v0 = 0.091;
+		r0 = 20.8;
+		v1 = 1.692;
+		r1 = 90.3;
+		return (voltage-v0)*(r1-r0)/(v1-v0)+r0;
+	default:
+		break;
+	}
 	return (voltage-0.005)*100/2.400+18;
 }
 
