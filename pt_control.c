@@ -130,7 +130,7 @@ double temperature(double resistance)
 	r1 = 118.19;
 	t0 = 70;
 	t1 = 320.0;
-	return t0+resistance*(r1-r0)/(t1-t0);
+	return t0+resistance*(t1-t0)/(r1-r0);
 }
 
 double pressure(double voltage)
