@@ -96,29 +96,31 @@ double resistance(double voltage, int channel)
 	double v0,v1,r0,r1;
 	switch(channel)
 	{
+	/* Each board resistance sensor is calibrated from a linear fit of the voltage
+	 * measured of two resistors*/
 	case 0:;
-		v0 = 0.087;
-		r0 = 20.8;
+		v0 = 0.038;
+		r0 = 21.1;
 		v1 = 1.694;
 		r1 = 90.3;
 		return (voltage-v0)*(r1-r0)/(v1-v0)+r0;
 	case 1:;
-		v0 = 0.091;
-		r0 = 20.8;
+		v0 = 0.043;
+		r0 = 21.1;
 		v1 = 1.692;
 		r1 = 90.3;
 		return (voltage-v0)*(r1-r0)/(v1-v0)+r0;
-	case 2:; //NOT CALIBRATED
-		v0 = 0.091;
-		r0 = 20.8;
-		v1 = 1.692;
-		r1 = 90.3;
+	case 2:;
+		v0 = 0.066;
+		r0 = 21.2;
+		v1 = 1.731;
+		r1 = 90.6;
 		return (voltage-v0)*(r1-r0)/(v1-v0)+r0;
-	case 3:; //NOT CALIBRATED
-		v0 = 0.091;
-		r0 = 20.8;
-		v1 = 1.692;
-		r1 = 90.3;
+	case 3:;
+		v0 = 0.117;
+		r0 = 21.0;
+		v1 = 1.782;
+		r1 = 90.6;
 		return (voltage-v0)*(r1-r0)/(v1-v0)+r0;
 	default:
 		break;
