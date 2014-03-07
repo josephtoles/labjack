@@ -125,7 +125,7 @@ double resistance(double voltage, int channel)
 	default:
 		break;
 	}
-	return (voltage-0.005)*100/2.400+18;
+	return (voltage-0.005)*100.0/2.400+18.0;
 }
 
 double temperature(double resistance)
@@ -134,8 +134,8 @@ double temperature(double resistance)
 	//return 72.0+(320.0-72.0)*(resistance-18.0)/100.0 ;
 	double r0,r1,t0,t1;
 	r0 = 17.11;
-	r1 = 118.19;
 	t0 = 70;
+	r1 = 118.19;
 	t1 = 320.0;
 	return t0+(resistance-r0)*(t1-t0)/(r1-r0);
 }
