@@ -44,7 +44,7 @@ int main(int argc, char **argv)
 	if( getCalibrationInfo(hDevice, &caliInfo) < 0)
 	{
 		fprintf(stderr, "error: could not get calibration info.\n");
-		return 1;	//	goto close;
+		return 1;
 	}
 
 	//read voltages
@@ -99,28 +99,28 @@ double resistance(double voltage, int channel)
 	/* Each board resistance sensor is calibrated from a linear fit of the voltage
 	 * measured of two resistors*/
 	case 0:;
-		v0 = 0.038;
-		r0 = 21.1;
-		v1 = 1.694;
-		r1 = 90.3;
+		v0 = 0.085;
+		r0 = 20.0;
+		v1 = 1.882;
+		r1 = 98.6;
 		return (voltage-v0)*(r1-r0)/(v1-v0)+r0;
 	case 1:;
-		v0 = 0.043;
+		v0 = 0.091;
 		r0 = 21.1;
-		v1 = 1.692;
-		r1 = 90.3;
+		v1 = 1.879;
+		r1 = 98.6;
 		return (voltage-v0)*(r1-r0)/(v1-v0)+r0;
 	case 2:;
-		v0 = 0.066;
-		r0 = 21.2;
-		v1 = 1.731;
+		v0 = 0.116;
+		r0 = 21.1;
+		v1 = 1.977;
 		r1 = 90.6;
 		return (voltage-v0)*(r1-r0)/(v1-v0)+r0;
 	case 3:;
 		v0 = 0.117;
 		r0 = 21.0;
-		v1 = 1.782;
-		r1 = 90.6;
+		v1 = 1.977;
+		r1 = 98.6;
 		return (voltage-v0)*(r1-r0)/(v1-v0)+r0;
 	default:
 		break;
@@ -142,5 +142,5 @@ double temperature(double resistance)
 
 double pressure(double voltage)
 {
-	return 200.0*(voltage-1.0)/4.0;
+	return 200.0*(voltage/2.4);
 }
