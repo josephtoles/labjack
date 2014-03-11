@@ -75,7 +75,7 @@ int main(int argc, char **argv)
 		for(int channel = 0; channel < 4; ++channel)
 			printf("  %5.1f", temperature(voltages[channel], channel)-CELCIUS_TO_KELVIN);
 		printf("\n");
-		printf("Pressure  (PSI)												   %5.1f\n", pressure(voltages[7]));
+		printf("Pressure  (PSI)                                                %5.1f\n", pressure(voltages[7]));
 		clock_t goal = CLOCKS_PER_SEC/UPDATES_PER_SECOND + clock();
 		while (goal > clock());
 		for(int i=0; i<5; ++i)
