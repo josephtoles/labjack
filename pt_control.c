@@ -16,7 +16,7 @@ void close_connection();
 double kelvin(double v);
 int main(int argc, char **argv);
 double resistance(double voltage, int channel);
-double temperature(double resistance);
+double temperature(double voltage, int channel);
 double pressure(double voltage);
 
 //CONSTANTS
@@ -69,11 +69,11 @@ int main(int argc, char **argv)
 		printf("\n");
 		printf("Temperature (K)");
 		for(int channel = 0; channel < 4; ++channel)
-			printf("  %5.1f", temperature(resistance(voltages[channel], channel)));
+			printf("  %5.1f", temperature(voltages[channel], channel));
 		printf("\n");
 		printf("Temperature (C)");
 		for(int channel = 0; channel < 4; ++channel)
-			printf("  %5.1f", temperature(resistance(voltages[channel], channel))+KELVIN_TO_CELCIUS);
+			printf("  %5.1f", temperature(voltages[channel], channel)+KELVIN_TO_CELCIUS);
 		printf("\n");
 		printf("Pressure  (PSI)                                                   %5.1f\n", pressure(voltages[7]));
 		clock_t goal = CLOCKS_PER_SEC/UPDATES_PER_SECOND + clock();
@@ -128,16 +128,13 @@ double resistance(double voltage, int channel)
 	return (voltage-0.005)*100.0/2.400+18.0;
 }
 
-double temperature(double resistance)
+double temperature(double voltage, int channel)
 {
-	//approximate, still needs fine tuning
-	//return 72.0+(320.0-72.0)*(resistance-18.0)/100.0 ;
-	double r0,r1,t0,t1;
-	r0 = 17.11;
-	t0 = 70;
-	r1 = 118.19;
-	t1 = 320.0;
-	return t0+(resistance-r0)*(t1-t0)/(r1-r0);
+	double v0 = 1.977, t0 = 4.6;
+	double v1 = 2.146, t1 = 23.9;
+	if (channel == 1 || channel == 2)
+		voltage -= 0.1;
+	return t0+(t1-t0)*(voltage-v0)/(v1-v0);
 }
 
 double pressure(double voltage)
