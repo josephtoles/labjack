@@ -20,10 +20,9 @@ double temperature(double voltage, int channel);
 double pressure(double voltage);
 
 //CONSTANTS
-static const int UPDATES_PER_SECOND = 10;
-static const int NUM_CHANNELS = 8;
-static const double CELCIUS_TO_KELVIN = 2.72.15;
-static const double KELVIN_TO_CELCIUS = -CELCIUS_TO_KELVIN;
+const int UPDATES_PER_SECOND = 10;
+const int NUM_CHANNELS = 8;
+const double CELCIUS_TO_KELVIN = 272.15;
 
 //STATIC VARIABLES
 static HANDLE hDevice;
@@ -74,7 +73,7 @@ int main(int argc, char **argv)
 		printf("\n");
 		printf("Temperature (C)");
 		for(int channel = 0; channel < 4; ++channel)
-			printf("  %5.1f", temperature(voltages[channel], channel)+KELVIN_TO_CELCIUS);
+			printf("  %5.1f", temperature(voltages[channel], channel)-CELCIUS_TO_KELVIN);
 		printf("\n");
 		printf("Pressure  (PSI)												   %5.1f\n", pressure(voltages[7]));
 		clock_t goal = CLOCKS_PER_SEC/UPDATES_PER_SECOND + clock();
