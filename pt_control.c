@@ -50,9 +50,9 @@ int main(int argc, char **argv)
 	//read voltages
 	int configIO = 1;
 	double voltages[NUM_CHANNELS];
-	printf("		 ");
+	printf("         ");
 	for(int i=0; i<NUM_CHANNELS; ++i)
-		printf("	Ch%d", i);
+		printf("    Ch%d", i);
 	printf("\n");
 	while(true)
 	{
