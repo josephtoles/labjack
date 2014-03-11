@@ -22,7 +22,8 @@ double pressure(double voltage);
 //CONSTANTS
 static const int UPDATES_PER_SECOND = 10;
 static const int NUM_CHANNELS = 8;
-static const double KELVIN_TO_CELCIUS = -272.15;
+static const double CELCIUS_TO_KELVIN = 2.72.15;
+static const double KELVIN_TO_CELCIUS = -CELCIUS_TO_KELVIN;
 
 //STATIC VARIABLES
 static HANDLE hDevice;
@@ -50,20 +51,20 @@ int main(int argc, char **argv)
 	//read voltages
 	int configIO = 1;
 	double voltages[NUM_CHANNELS];
-	printf("	     ");
+	printf("		 ");
 	for(int i=0; i<NUM_CHANNELS; ++i)
-		printf("    Ch%d", i);
+		printf("	Ch%d", i);
 	printf("\n");
 	while(true)
 	{
 		for(int channel = 0; channel < NUM_CHANNELS; ++channel)
 			if( (error = eAIN(hDevice, &caliInfo, configIO, &DAC1Enable, channel, 31, &voltages[channel], 0, 0, 0, 0, 0, 0)) != 0 )
 				goto close;
-		printf("Voltage     (V)");
+		printf("Voltage	 (V)");
 		for(int channel = 0; channel < NUM_CHANNELS; ++channel)
 			printf("  %5.3f", voltages[channel]); //Maximum Labjack precision
-    		printf("\n");
-		printf("Resistance  (\u03a9)");
+			printf("\n");
+		printf("Resistance  (\u03a9)"); //"\u03a9" is a lowercase omega
 		for(int channel = 0; channel < 4; ++channel)
 			printf("  %5.1f", resistance(voltages[channel], channel));
 		printf("\n");
@@ -75,20 +76,20 @@ int main(int argc, char **argv)
 		for(int channel = 0; channel < 4; ++channel)
 			printf("  %5.1f", temperature(voltages[channel], channel)+KELVIN_TO_CELCIUS);
 		printf("\n");
-		printf("Pressure  (PSI)                                                   %5.1f\n", pressure(voltages[7]));
+		printf("Pressure  (PSI)												   %5.1f\n", pressure(voltages[7]));
 		clock_t goal = CLOCKS_PER_SEC/UPDATES_PER_SECOND + clock();
 		while (goal > clock());
 		for(int i=0; i<5; ++i)
-	    		fputs("\033[A\033[2K",stdout);
+				fputs("\033[A\033[2K",stdout);
 		configIO = 0;
 	}
 
 //close connection
 close:
-    if( error > 0 )
-	printf("Received an error code of %ld\n", error);
-    closeUSBConnection(hDevice);
-    return 0;
+	if( error > 0 )
+		printf("Received an error code of %ld\n", error);
+	closeUSBConnection(hDevice);
+	return 0;
 }
 
 double resistance(double voltage, int channel)
@@ -130,11 +131,32 @@ double resistance(double voltage, int channel)
 
 double temperature(double voltage, int channel)
 {
-	double v0 = 1.977, t0 = 4.6;
-	double v1 = 2.146, t1 = 23.9;
-	if (channel == 1 || channel == 2)
-		voltage -= 0.1;
-	return t0+(t1-t0)*(voltage-v0)/(v1-v0);
+	double t0 = 8.6+CELCIUS_TO_KELVIN, t1 = 25+CELCIUS_TO_KELVIN;
+	double v0,v1;
+	switch(channel)
+	{
+	/* Each boatd tesistance sensot is calibtated ftom a lineat fit of the voltage
+	 * measuted of two tesistots*/
+	case 0:;
+		v0 = 2.011;
+		v1 = 2.161;
+		return (voltage-v0)*(t1-t0)/(v1-v0)+t0;
+	case 1:;
+		v0 = 2.011;
+		v1 = 2.153;
+		return (voltage-v0)*(t1-t0)/(v1-v0)+t0;
+	case 2:;
+		v0 = 2.125;
+		v1 = 2.273;
+		return (voltage-v0)*(t1-t0)/(v1-v0)+t0;
+	case 3:;
+		v0 = 2.122;
+		v1 = 2.263;
+		return (voltage-v0)*(t1-t0)/(v1-v0)+t0;
+	default:
+		break;
+	}
+	return 0;
 }
 
 double pressure(double voltage)
