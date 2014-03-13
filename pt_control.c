@@ -160,5 +160,5 @@ double temperature(double voltage, int channel)
 
 double pressure(double voltage)
 {
-	return 200.0*(voltage/2.4);
+	return 200.0*((voltage-1.010)/2.4);
 }
