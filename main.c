@@ -52,21 +52,21 @@ int main(int argc, char **argv)
 		for(int channel = 0; channel < NUM_CHANNELS; ++channel)
 			if( (error = eAIN(hDevice, &caliInfo, configIO, &DAC1Enable, channel, 31, &voltages[channel], 0, 0, 0, 0, 0, 0)) != 0 )
 				goto close;
-		printf("Voltage	 (V)");
+		printf("Voltage	    (V)");
 		for(int channel = 0; channel < NUM_CHANNELS; ++channel)
-			printf("  %5.3f", voltages[channel]); //Maximum Labjack precision
+			printf("  %6.3f", voltages[channel]); //Maximum Labjack precision
 			printf("\n");
 		printf("Resistance  (\u03a9)"); //"\u03a9" is a lowercase omega
 		for(int channel = 0; channel < 4; ++channel)
-			printf("  %5.1f", resistance(voltages[channel], channel));
+			printf("  %6.1f", resistance(voltages[channel], channel));
 		printf("\n");
 		printf("Temperature (K)");
 		for(int channel = 0; channel < 4; ++channel)
-			printf("  %5.1f", temperature(voltages[channel], channel));
+			printf("  %6.1f", temperature(voltages[channel], channel));
 		printf("\n");
 		printf("Temperature (C)");
 		for(int channel = 0; channel < 4; ++channel)
-			printf("  %5.1f", temperature(voltages[channel], channel)-CELCIUS_TO_KELVIN);
+			printf("  %6.1f", temperature(voltages[channel], channel)-CELCIUS_TO_KELVIN);
 		printf("\n");
 		printf("Pressure  (PSI)                                                %5.1f\n", pressure(voltages[7]));
 		if(time_since_last_save > SAVE_DELAY)
