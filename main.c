@@ -75,7 +75,7 @@ int main(int argc, char **argv)
 			save_datum(voltages, pressure(voltages[7]));
 		}
 		clock_t goal = CLOCKS_PER_SEC/UPDATES_PER_SECOND + clock();
-		time_since_last_save += CLOCKS_PER_SEC/UPDATES_PER_SECOND;
+		time_since_last_save += 1.0/UPDATES_PER_SECOND;
 		while (goal > clock());
 		for(int i=0; i<5; ++i)
 				fputs("\033[A\033[2K",stdout);

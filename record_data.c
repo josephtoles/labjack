@@ -28,7 +28,7 @@ void save_datum(const double voltages[4], const double pressure_k)
 	strftime (newline,80,"%H:%M:%S ",timeinfo);
 
 	FILE* ofp = fopen(file_name, "a");
-	strcat(newline, "| %5.1f| %5.1f| %5.1f| %5.1f|   %5.1f");
+	strcat(newline, "| %5.1f| %5.1f| %5.1f| %5.1f|   %5.1f\n");
 	fprintf(ofp, newline,
 		voltages[0], voltages[1], voltages[2], voltages[3],
 		pressure_k);
