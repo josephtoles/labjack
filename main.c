@@ -6,18 +6,7 @@
  * @date February 21, 2013
  */
 
-#include "u3.h"
-#include <unistd.h>
-#include <stdio.h>
-#include <time.h> 
-
-//HEADERS
-void close_connection();
-double kelvin(double v);
-int main(int argc, char **argv);
-double resistance(double voltage, int channel);
-double temperature(double voltage, int channel);
-double pressure(double voltage);
+#include "main.h"
 
 //CONSTANTS
 const int UPDATES_PER_SECOND = 10;
@@ -35,6 +24,10 @@ static long DAC1Enable;
 
 int main(int argc, char **argv)
 {
+	create_record();
+	double data[4]  = {1,2,368,4};
+	save_datum(data, 14.9);
+
 	//open connection
 	if( (hDevice = openUSBConnection(localID)) == NULL)
 	{
@@ -158,7 +151,11 @@ double temperature(double voltage, int channel)
 	return 0;
 }
 
+//Both pressure and voltage start at zero here, after counting the offset
+const double PRESSURE_VOLTAGE_OFFSET = 0.010;
+const double VOLTAGE_RANGE = 2.4;
+const double PRESSURE_RANGE = 200.0; //(PSI)
 double pressure(double voltage)
 {
-	return 200.0*((voltage-0.010)/2.4);
+	return PRESSURE_RANGE*((voltage-PRESSURE_VOLTAGE_OFFSET)/VOLTAGE_RANGE);
 }

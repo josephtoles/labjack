@@ -5,8 +5,11 @@
 CC=gcc
 CFLAGS=-std=gnu99
 
-PT_CONTROL_SRC=pt_control.c u3.c
-PT_CONTROL_OBJ=$(PT_CONTROL_SRC:.c=.o)
+MAIN_SRC=main.c main.h u3.c
+MAIN_OBJ=$(MAIN_SRC:.c=.o)
+
+RECORD_DATA_SRC=record_data.c record_data.h
+RECORD_DATA_OBJ=$(RECORD_DATA_SRC:.c=.o)
 
 SRCS=$(wildcard *.c)
 HDRS=$(wildcard *.h)
@@ -14,10 +17,13 @@ HDRS=$(wildcard *.h)
 CFLAGS +=-Wall -g
 LIBS=-lm -llabjackusb
 
-all: pt_control
+all: main
 
-pt_control: $(PT_CONTROL_OBJ) $(HDRS)
-	$(CC) -o run $(CFLAGS) $(PT_CONTROL_OBJ) $(LDFLAGS) $(LIBS)
+main: $(MAIN_OBJ) $(RECORD_DATA_OBJ) $(HDRS)
+	$(CC) -o main $(CFLAGS) $(MAIN_OBJ) $(RECORD_DATA_OBJ) $(LDFLAGS) $(LIBS)
+
+record_data: $(RECORD_DATA_OBJ) $(HDRS)
+	$(CC) -c $(CFLAGS) $(RECORD_DATA_OBJ) $(LDFLAGS)
 
 clean:
-	rm -f *.o run *~ pt_control
+	rm -f *.o main *~ pt_control
