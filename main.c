@@ -12,6 +12,7 @@
 const int UPDATES_PER_SECOND = 10;
 const int NUM_CHANNELS = 8;
 const double CELCIUS_TO_KELVIN = 272.15;
+const int SAVE_DELAY = 60; //seconds
 
 //STATIC VARIABLES
 static HANDLE hDevice;
@@ -45,6 +46,7 @@ int main(int argc, char **argv)
 	for(int i=0; i<NUM_CHANNELS; ++i)
 		printf("    Ch%d", i);
 	printf("\n");
+	double time_since_last_save = 0;
 	while(true)
 	{
 		for(int channel = 0; channel < NUM_CHANNELS; ++channel)
@@ -67,8 +69,13 @@ int main(int argc, char **argv)
 			printf("  %5.1f", temperature(voltages[channel], channel)-CELCIUS_TO_KELVIN);
 		printf("\n");
 		printf("Pressure  (PSI)                                                %5.1f\n", pressure(voltages[7]));
-		save_datum(voltages, pressure(voltages[7]));
+		if(time_since_last_save > SAVE_DELAY)
+		{
+			time_since_last_save = 0;
+			save_datum(voltages, pressure(voltages[7]));
+		}
 		clock_t goal = CLOCKS_PER_SEC/UPDATES_PER_SECOND + clock();
+		time_since_last_save += CLOCKS_PER_SEC/UPDATES_PER_SECOND;
 		while (goal > clock());
 		for(int i=0; i<5; ++i)
 				fputs("\033[A\033[2K",stdout);
