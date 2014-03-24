@@ -1,0 +1,2 @@
+chown root main
+chmod u+s main
