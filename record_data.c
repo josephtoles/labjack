@@ -17,7 +17,7 @@ void create_record()
 	fclose(ofp);
 }
 
-void save_datum(const double voltages[4], const double pressure_k)
+void save_datum(double temperatures[4], double pressure_k)
 {
 	char newline[200];
 
@@ -30,7 +30,10 @@ void save_datum(const double voltages[4], const double pressure_k)
 	FILE* ofp = fopen(file_name, "a");
 	strcat(newline, "| %5.1f| %5.1f| %5.1f| %5.1f|   %5.1f\n");
 	fprintf(ofp, newline,
-		voltages[0], voltages[1], voltages[2], voltages[3],
+		temperatures[0], temperatures[1], temperatures[2], temperatures[3],
+		pressure_k);
+	fprintf(ofp, newline,
+		2.0, 5.0, 3.6, -90.2,
 		pressure_k);
 	fclose(ofp);
 }

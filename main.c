@@ -72,7 +72,10 @@ int main(int argc, char **argv)
 		if(time_since_last_save > SAVE_DELAY)
 		{
 			time_since_last_save = 0;
-			save_datum(voltages, pressure(voltages[7]));
+			double temperatures[4];
+			for(int i=0; i<4; ++i)
+				temperatures[i] = temperature(voltages[i], i);
+			save_datum(temperatures, pressure(voltages[7]));
 		}
 		clock_t goal = CLOCKS_PER_SEC/UPDATES_PER_SECOND + clock();
 		time_since_last_save += 1.0/UPDATES_PER_SECOND;
@@ -92,6 +95,7 @@ close:
 
 double resistance(double voltage, int channel)
 {
+	//are these the voltages including or not including the cable?
 	double v0,v1,r0,r1;
 	switch(channel)
 	{

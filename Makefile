@@ -20,6 +20,7 @@ LIBS=-lm -llabjackusb
 all: main
 
 main: $(MAIN_OBJ) $(RECORD_DATA_OBJ) $(HDRS)
+	rm -f main
 	$(CC) -o main $(CFLAGS) $(MAIN_OBJ) $(RECORD_DATA_OBJ) $(LDFLAGS) $(LIBS)
 
 record_data: $(RECORD_DATA_OBJ) $(HDRS)
