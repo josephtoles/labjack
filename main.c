@@ -12,7 +12,7 @@
 const int UPDATES_PER_SECOND = 10;
 const int NUM_CHANNELS = 8;
 const double CELCIUS_TO_KELVIN = 272.15;
-const int SAVE_DELAY = 60; //seconds
+const int SAVE_DELAY = 1; //seconds
 
 //STATIC VARIABLES
 static HANDLE hDevice;
