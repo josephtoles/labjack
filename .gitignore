@@ -2,5 +2,5 @@ run
 main
 *.o
 data*
-[1-9|0]+
 *.swp
+2014*
