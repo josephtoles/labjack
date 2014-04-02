@@ -32,8 +32,5 @@ void save_datum(double temperatures[4], double pressure_k)
 	fprintf(ofp, newline,
 		temperatures[0], temperatures[1], temperatures[2], temperatures[3],
 		pressure_k);
-	fprintf(ofp, newline,
-		2.0, 5.0, 3.6, -90.2,
-		pressure_k);
 	fclose(ofp);
 }
