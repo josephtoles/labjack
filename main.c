@@ -21,10 +21,15 @@ static int localID = -1;
 static long error = 0;
 static long DAC1Enable;
 
-//FUNCTION BODIES
 
+//FUNCTION BODIES
 int main(int argc, char **argv)
 {
+    int num_saved = 0;
+    int ar_len = 10;
+    int ar_temp[num_saved];
+    int ar_time[num_saved];
+
 	create_record();
 
 	//open connection
@@ -49,6 +54,7 @@ int main(int argc, char **argv)
 	double time_since_last_save = 0;
 	while(true)
 	{
+        //Update standard output
 		for(int channel = 0; channel < NUM_CHANNELS; ++channel)
 			if( (error = eAIN(hDevice, &caliInfo, configIO, &DAC1Enable, channel, 31, &voltages[channel], 0, 0, 0, 0, 0, 0)) != 0 )
 				goto close;
@@ -69,16 +75,33 @@ int main(int argc, char **argv)
 			printf("  %6.1f", temperature(voltages[channel], channel)-CELCIUS_TO_KELVIN);
 		printf("\n");
 		printf("Pressure  (PSI)                                                         %5.1f\n", pressure(voltages[7]));
+
+        //Calculate temperatures
+		double temperatures[4];
+		for(int i=0; i<4; ++i)
+			temperatures[i] = temperature(voltages[i], i);
+
+        //Save or don't save
 		if(time_since_last_save > SAVE_DELAY)
 		{
 			time_since_last_save = 0;
-			double temperatures[4];
-			for(int i=0; i<4; ++i)
-				temperatures[i] = temperature(voltages[i], i);
 			save_datum(temperatures, pressure(voltages[7]));
 		}
-		clock_t goal = CLOCKS_PER_SEC/UPDATES_PER_SECOND + clock();
 		time_since_last_save += 1.0/UPDATES_PER_SECOND;
+
+        /*        
+        //Update graph
+        if(num_saved >= ar_len-2)
+        {
+            ar_temp = double[20];
+        }
+        ar_temp[num_saved] = temperatures[0];
+        ar_time[num_saved] = num_saved*10+1;
+        ++num_saved;
+        */
+
+        //Pause before updating screen
+		clock_t goal = CLOCKS_PER_SEC/UPDATES_PER_SECOND + clock();
 		while (goal > clock());
 		for(int i=0; i<5; ++i)
 				fputs("\033[A\033[2K",stdout);
