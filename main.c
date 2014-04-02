@@ -52,6 +52,7 @@ int main(int argc, char **argv)
 		for(int channel = 0; channel < NUM_CHANNELS; ++channel)
 			if( (error = eAIN(hDevice, &caliInfo, configIO, &DAC1Enable, channel, 31, &voltages[channel], 0, 0, 0, 0, 0, 0)) != 0 )
 				goto close;
+		print_status(voltages);
 		printf("Voltage	    (V)");
 		for(int channel = 0; channel < NUM_CHANNELS; ++channel)
 			printf("  %6.3f", voltages[channel]); //Maximum Labjack precision

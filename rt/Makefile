@@ -9,9 +9,9 @@ ROOT_LIBS = `$(ROOTSYS)/bin/root-config --libs` -lThread -lGui
 
 CFLAGS = $(ROOT_CFLAGS) -g -fPIC
 
-all: Main
+all: run
 
-Main : main.o
+run : main.o
 	$(CC) $(CFLAGS) -o $@ main.o $(ROOT_LIBS)
 
 main.o: main.cpp
@@ -20,7 +20,7 @@ main.o: main.cpp
 .PHONY: clean
 
 clean:
-	rm -f *.o $(INC_DIR)/*~ *~ Main
+	rm -f *.o $(INC_DIR)/*~ *~ run
 
 
 

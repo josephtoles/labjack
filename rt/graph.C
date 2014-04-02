@@ -1,9 +1,6 @@
 #include <unistd.h>
 
-
-
 void graph() {
-while(true){
 	TCanvas *c1 = new TCanvas("c1","Graph Name",200,10,700,500);
 
 	c1->SetFillColor(42);
@@ -33,5 +30,5 @@ while(true){
 	sleep(1);
 	//fputs("\033[A\033[2K",stdout);
 	//fputs("\033[A\033[2K",stdout);
-}
+	exit();
 }
