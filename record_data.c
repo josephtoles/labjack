@@ -1,7 +1,7 @@
 #include "record_data.h"
 
 static char file_name[80];
-
+static char folder[100] = "./logs/";
 void create_record()
 {
 	time_t rawtime;
@@ -9,8 +9,11 @@ void create_record()
 	struct tm* timeinfo;
 	timeinfo = localtime(&rawtime);
 	strftime (file_name,80,"%Y-%m-%d_%H:%M:%S",timeinfo);
+    char path[100] = "";
+    strcpy(path, folder);
+    strcat(path, file_name);
 
-	FILE* ofp = fopen(file_name, "w");
+	FILE* ofp = fopen(path, "w");
 	fprintf(ofp, "Timestamp| RTD1 | RTD2 | RTD3 | RTD4 |Pressure\n");
 	fprintf(ofp, "hh:mm:ss | (K)  | (K)  | (K)  | (K)  | (PSI)  \n");
 	fprintf(ofp, "---------+------+------+------+------+--------\n");
