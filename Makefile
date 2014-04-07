@@ -12,10 +12,10 @@ RECORD_DATA_SRC=record_data.c record_data.h
 RECORD_DATA_OBJ=$(RECORD_DATA_SRC:.c=.o)
 
 TEMP_GRAPH_SRC=temp_graph.c temp_graph.h
-TEMP_GRAPH_OBJ=$(TEMP_GRAPH_SRC:.v=.o)
+TEMP_GRAPH_OBJ=$(TEMP_GRAPH_SRC:.c=.o)
 
 PRES_GRAPH_SRC=pres_graph.c pres_graph.h
-PRES_GRAPH_OBJ=$(PRES_GRAPH_SRC:.v=.o)
+PRES_GRAPH_OBJ=$(PRES_GRAPH_SRC:.c=.o)
 
 SRCS=$(wildcard *.c)
 HDRS=$(wildcard *.h)

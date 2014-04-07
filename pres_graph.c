@@ -25,7 +25,7 @@ int flash_pres_animation(double x[], double y[], int n, int update_delay)
 const char PRES_BEGINNING[] = 
     "#include<unistd.h>\n"
     "void pres_graph() {\n"
-    "TCanvas *c1 = new TCanvas(\"c1\", \"Pressure\", 10, 610, 700, 500);\n"
+    "TCanvas *c1 = new TCanvas(\"c1\", \"Pressure\", 10, 530, 700, 450);\n"
     "c1->SetFillColor(42);\n"
     "c1->SetGrid();\n";
     //root file arrays go here

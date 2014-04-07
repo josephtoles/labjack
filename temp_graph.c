@@ -7,6 +7,7 @@ int pID;
 int create_temp_script(double x[], double y[], int n, int update_delay);
 void temp_int_handler(int);
 void temp_cleanup();
+void add_graph(FILE* f, int index, double x[], double y[], int n);
 
 //The graph will be displayed for a time equal to the update_delay
 int flash_temp_animation(double x[], double y[], int n, int update_delay)
@@ -25,7 +26,7 @@ int flash_temp_animation(double x[], double y[], int n, int update_delay)
 const char TEMP_BEGINNING[] = 
     "#include<unistd.h>\n"
     "void temp_graph() {\n"
-    "TCanvas *c1 = new TCanvas(\"c1\", \"Temperature\", 10, 10, 700, 500);\n"
+    "TCanvas *c1 = new TCanvas(\"c1\", \"Temperature\", 10, 40, 700, 450);\n"
     //"c1->SetFillColor(42);\n"
     "c1->SetGrid();\n"
     "TMultiGraph *mg = new TMultiGraph();\n";
@@ -63,6 +64,33 @@ const char GRAPHS[] =
 "gr2->Fit(\"pol5\",\"q\");"
 "mg->Add(gr2);\n";
 
+void add_graph(FILE* f, int index, double x[], double y[], int n)
+{
+    fprintf(f, "const Int_t n%d = %d;\n", index, n);
+    fprintf(f, "Double_t x%d[] = {", index);
+    for(int i=0; i<n; ++i)
+    {
+        fprintf(f, "%f", x[i]);
+        if(i != n-1)
+            fprintf(f, ",");
+    }
+    fprintf(f, "};\n");
+    fprintf(f, "Double_t y%d[] = {", index);
+    for(int i=0; i<n; ++i)
+    {
+        fprintf(f, "%f", y[i]);
+        if(i != n-1)
+            fprintf(f, ",");
+    }
+    fprintf(f, "};\n");
+    fprintf(f, "TGraph *gr%d = new TGraph(n%d,x%d,y%d);\n", index, index, index, index);
+    fprintf(f, "gr%d->SetMarkerColor(kBlue);\n", index);
+    fprintf(f, "gr%d->SetMarkerStyle(21);\n", index);
+    fprintf(f, "gr%d->Fit(\"pol6\",\"q\");\n", index);
+    fprintf(f, "mg->Add(gr%d);\n", index);
+
+}
+
 
 int create_temp_script(double x[], double y[], int n, int update_delay)
 {
@@ -78,7 +106,8 @@ int create_temp_script(double x[], double y[], int n, int update_delay)
     fprintf(f, TEMP_BEGINNING);
 
     //graphs
-    fprintf(f, GRAPHS);
+    for(int i=1; i<=2; ++i)
+        add_graph(f, i, x, y, n);
 
     //middle
     fprintf(f, TEMP_MIDDLE);
@@ -109,5 +138,6 @@ void temp_int_handler(int sig)
 
 void temp_cleanup()
 {
-    unlink(TEMP_ROOT_FILE_NAME);
+    //uncomment following line after testing
+    //unlink(TEMP_ROOT_FILE_NAME);
 }
