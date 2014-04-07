@@ -2,7 +2,7 @@
 #define MAIN_H_
 
 #include "record_data.h"
-#include "graph.h"
+#include "temp_graph.h"
 #include "u3.h"
 
 #include <signal.h>

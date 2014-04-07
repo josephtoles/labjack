@@ -12,8 +12,8 @@
 const int UPDATES_PER_SECOND = 10;
 const int NUM_CHANNELS = 8;
 const double CELCIUS_TO_KELVIN = 272.15;
-const int SAVE_DELAY = 5; //seconds
-const int GRAPH_UPDATE_DELAY = 10; //seconds //change this to something like 60 later.
+const int SAVE_DELAY = 60; //seconds
+const int GRAPH_UPDATE_DELAY = 4; //seconds //change this to something like 60 later.
 
 //STATIC VARIABLES
 static HANDLE hDevice;
@@ -142,7 +142,7 @@ int main(int argc, char **argv)
         //Update graph
         if(clock() >= CLOCKS_PER_SEC*GRAPH_UPDATE_DELAY + last_graph_update)
         {
-            flash_animation(ar_time, ar_temp, num_saved, GRAPH_UPDATE_DELAY);
+            flash_temp_animation(ar_time, ar_temp, num_saved, GRAPH_UPDATE_DELAY);
             last_graph_update = clock();
         }
 
