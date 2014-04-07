@@ -30,6 +30,10 @@ void multi_graph(){
     mg->Draw("ap");
     
       //force drawing of canvas to generate the fit TPaveStats
+    nt create_temp_script(double x[], double y[], int n, int update_delay);
+    int create_pres_script(double x[], double y[], int n, int update_delay);
+    void INThandler(int);
+    void cleanup();
     c1->Update();
     return c1;
 }

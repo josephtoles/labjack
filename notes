@@ -2,4 +2,16 @@ See if images can save...
 
 Make routine to look at certain region.
 
+Read this:
+https://muon.npl.washington.edu/elog/musun/UW+lab+work/330
 
+Calibrate pressure sensor with a voltage generator
+
+Modify program to record raw voltage, resistance
+
+
+0.4/0.5 (PSI) should be zero
+    0.015V read by box
+    1.000V (pressure sensor output)
+15.0/15.1 (PSI) is 1 atm
+    0.192V

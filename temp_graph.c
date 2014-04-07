@@ -26,49 +26,71 @@ const char TEMP_BEGINNING[] =
     "#include<unistd.h>\n"
     "void temp_graph() {\n"
     "TCanvas *c1 = new TCanvas(\"c1\", \"Temperature\", 10, 10, 700, 500);\n"
-    "c1->SetFillColor(42);\n"
-    "c1->SetGrid();\n";
-    //root file arrays go here
-const char TEMP_MIDDLE[] =
-    "gr = new TGraph(n, x, y);\n"
-    "gr->SetLineColor(2);\n"
-    "gr->SetLineWidth(4);\n"
-    "gr->SetMarkerColor(4);\n"
-    "gr->SetMarkerStyle(21);\n"
-    "gr->SetTitle(\"Graph of temperature\");\n"
-    "gr->GetXaxis()->SetTitle(\"Time\");\n"
-    "gr->GetYaxis()->SetTitle(\"Temperature\");\n"
-    "gr->Draw(\"ACP\");\n"
-    "c1->Update();\n" //this command draws the frame, after which one can change it
-    "c1->GetFrame()->SetFillColor(21);\n"
-    "c1->GetFrame()->SetBorderSize(12);\n"
-    "c1->Modified();\n";
-    //root file sleep command goes here
+    //"c1->SetFillColor(42);\n"
+    "c1->SetGrid();\n"
+    "TMultiGraph *mg = new TMultiGraph();\n";
+
+    /* root file graphs are inserted here */
+   
+
+const char TEMP_MIDDLE[] = 
+    "mg->Draw(\"ap\");\n"
+    "c1->Update();\n";
+
+    /* root file sleep command goes here */
+
 const char TEMP_END[] = 
     "exit();\n"
     "}\n";
 
+//tracer only
+const char GRAPHS[] = 
+"const Int_t n1 = 10;\n"
+"Double_t x1[]  = {-0.1, 0.05, 0.25, 0.35, 0.5, 0.61,0.7,0.85,0.89,0.95};\n"
+"Double_t y1[]  = {-1,2.9,5.6,7.4,9,9.6,8.7,6.3,4.5,1};\n"
+"TGraph *gr1 = new TGraph(n1,x1,y1);\n"
+"gr1->SetMarkerColor(kBlue);\n"
+"gr1->SetMarkerStyle(21);\n"
+"gr1->Fit(\"pol6\",\"q\");\n"
+"mg->Add(gr1);\n"
+""
+"const Int_t n2 = 10;"
+"Float_t x2[]  = {-0.28, 0.005, 0.19, 0.29, 0.45, 0.56,0.65,0.80,0.90,1.01};"
+"Float_t y2[]  = {2.1,3.86,7,9,10,10.55,9.64,7.26,5.42,2};"
+"TGraph *gr2 = new TGraph(n2,x2,y2);"
+"gr2->SetMarkerColor(kRed);"
+"gr2->SetMarkerStyle(20);"
+"gr2->Fit(\"pol5\",\"q\");"
+"mg->Add(gr2);\n";
+
+
 int create_temp_script(double x[], double y[], int n, int update_delay)
 {
+    //open file
     FILE *f = fopen(TEMP_ROOT_FILE_NAME, "w");
     if (f == NULL)
     {
             printf("Error opening file!\n");
             return 1;
     }
+
+    //beginning
     fprintf(f, TEMP_BEGINNING);
-    fprintf(f, "const Int_t n = %d;\n", n);
-    fprintf(f, "Double_t x[%d], y[%d];\n", n, n);
-    int i=0;
-    while(i<n){
-        fprintf(f, "x[%d] = %f;\n", i, x[i]);
-        fprintf(f, "y[%d] = %f;\n", i, y[i]); 
-        ++i;};
+
+    //graphs
+    fprintf(f, GRAPHS);
+
+    //middle
     fprintf(f, TEMP_MIDDLE);
+
+    //sleep
     fprintf(f, "sleep(%d);\n", update_delay);
+
+    //end
     fprintf(f, TEMP_END);
     fclose(f);
 
+    //execute
     char com[100] = "root -l ";
     strcat(com, TEMP_ROOT_FILE_NAME);
     strcat(com, " &> /dev/null");
