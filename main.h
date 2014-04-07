@@ -13,5 +13,6 @@ int main(int argc, char **argv);
 double resistance(double voltage, int channel);
 double temperature(double voltage, int channel);
 double pressure(double voltage);
+void INThandler(int sig);
 
 #endif

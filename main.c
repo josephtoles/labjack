@@ -6,6 +6,11 @@
  * @date February 21, 2013
  */
 
+#include <stdio.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <unistd.h>
+
 #include "main.h"
 
 //CONSTANTS
@@ -21,14 +26,19 @@ static int localID = -1;
 static long error = 0;
 static long DAC1Enable;
 
+//DYNAMIC MEMORY
+double* ar_time;
+double* ar_temp;
+int ar_len = 10; //dynamic memory array length
+int num_saved = 0;
 
 //FUNCTION BODIES
 int main(int argc, char **argv)
 {
-    int num_saved = 0;
-    int ar_len = 10;
-    int ar_temp[num_saved];
-    int ar_time[num_saved];
+    signal(SIGINT, INThandler);
+
+    ar_time = (double*)malloc(ar_len*sizeof(double));
+    ar_temp = (double*)malloc(ar_len*sizeof(double));
 
 	create_record();
 
@@ -87,13 +97,34 @@ int main(int argc, char **argv)
 		for(int i=0; i<4; ++i)
 			temperatures[i] = temperature(voltages[i], i);
 
-        //Save or don't save
-		if(time_since_last_save > SAVE_DELAY)
+        //Save to disc
+        if(time_since_last_save > SAVE_DELAY)
 		{
 			time_since_last_save = 0;
 			save_datum(temperatures, pressure(voltages[7]));
 		}
 		time_since_last_save += 1.0/UPDATES_PER_SECOND;
+
+        //Arrays, graph, dynamic memory
+        if(num_saved == ar_len) //arrays are full
+        {
+            double* n_ar_time = (double*)malloc(2*ar_len*sizeof(double));
+            for(int i=0; i<ar_len; ++i)
+                n_ar_time[i] = ar_time[i];
+            free(ar_time);
+            ar_time = n_ar_time;
+    
+            double* n_ar_temp= (double*)malloc(2*ar_len*sizeof(double));
+            for(int i=0; i<ar_len; ++i)
+                n_ar_temp[i] = ar_temp[i];
+            free(ar_temp);
+            ar_temp = n_ar_temp;
+    
+            ar_len *= 2;
+        }
+        ar_temp[num_saved] = temperatures[0];
+        ar_time[num_saved] = num_saved;
+        ++num_saved;
 
         /*        
         //Update graph
@@ -197,4 +228,12 @@ const double PRESSURE_RANGE = 200.0; //(PSI)
 double pressure(double voltage)
 {
 	return PRESSURE_RANGE*((voltage-PRESSURE_VOLTAGE_OFFSET)/VOLTAGE_RANGE);
+}
+
+//Frees dynamically allocated memory in the case of a Ctrl+C
+void INThandler(int sig)
+{
+    free(ar_time);
+    free(ar_temp);
+    exit(0);
 }
