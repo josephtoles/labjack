@@ -1,11 +1,16 @@
-//The graph will be displayed for a tiem equal to the UPDATE_DELAY
-int flash_animation(double x[], double y[], int n)
+#include "graph.h"
+
+int update_delay = 3;
+const char* ROOT_FILE_NAME = "graph.C";
+
+//The graph will be displayed for a tiem equal to the update_delay
+int flash_animation(double x[], double y[], int n, int update_delay)
 {
     signal(SIGINT, INThandler);
     pID = fork();
     if(pID==0)
     {
-        create_script(x,y,n);
+        create_script(x,y,n, update_delay);
         exit(0);
     }
     return 0;
@@ -38,7 +43,7 @@ const char END[] =
     "exit();\n"
     "}\n";
 
-int create_script(double x[], double y[], int n)
+int create_script(double x[], double y[], int n, int update_delay)
 {
     FILE *f = fopen(ROOT_FILE_NAME, "w");
     if (f == NULL)
@@ -55,7 +60,7 @@ int create_script(double x[], double y[], int n)
         fprintf(f, "y[%d] = %f;\n", i, y[i]); 
         ++i;};
     fprintf(f, MIDDLE);
-    fprintf(f, "sleep(%d);\n", UPDATE_DELAY);
+    fprintf(f, "sleep(%d);\n", update_delay);
     fprintf(f, END);
     fclose(f);
 

@@ -2,7 +2,11 @@
 #define MAIN_H_
 
 #include "record_data.h"
+#include "graph.h"
 #include "u3.h"
+
+#include <signal.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <time.h>
@@ -13,6 +17,5 @@ int main(int argc, char **argv);
 double resistance(double voltage, int channel);
 double temperature(double voltage, int channel);
 double pressure(double voltage);
-void INThandler(int sig);
 
 #endif

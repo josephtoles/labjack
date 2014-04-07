@@ -11,6 +11,9 @@ MAIN_OBJ=$(MAIN_SRC:.c=.o)
 RECORD_DATA_SRC=record_data.c record_data.h
 RECORD_DATA_OBJ=$(RECORD_DATA_SRC:.c=.o)
 
+GRAPH_SRC=graph.c graph.h
+GRAPH_OBJ=$(GRAPH_SRC:.v=.o)
+
 SRCS=$(wildcard *.c)
 HDRS=$(wildcard *.h)
 
@@ -21,10 +24,13 @@ all: main
 
 main: $(MAIN_OBJ) $(RECORD_DATA_OBJ) $(HDRS)
 	rm -f main
-	$(CC) -o main $(CFLAGS) $(MAIN_OBJ) $(RECORD_DATA_OBJ) $(LDFLAGS) $(LIBS)
+	$(CC) -o main $(CFLAGS) $(MAIN_OBJ) $(RECORD_DATA_OBJ) $(GRAPH_OBJ) $(LDFLAGS) $(LIBS)
 
 record_data: $(RECORD_DATA_OBJ) $(HDRS)
 	$(CC) -c $(CFLAGS) $(RECORD_DATA_OBJ) $(LDFLAGS)
+
+graph: $(GRAPH_OBJ) $(HDRS)
+	$(CC) -c $(CFLAGS) $(GRAPH_OBJ) $(LDFLAGS)
 
 clean:
 	rm -f *.o main *~ pt_control

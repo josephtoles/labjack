@@ -6,11 +6,6 @@
  * @date February 21, 2013
  */
 
-#include <stdio.h>
-#include <signal.h>
-#include <stdlib.h>
-#include <unistd.h>
-
 #include "main.h"
 
 //CONSTANTS
@@ -18,6 +13,7 @@ const int UPDATES_PER_SECOND = 10;
 const int NUM_CHANNELS = 8;
 const double CELCIUS_TO_KELVIN = 272.15;
 const int SAVE_DELAY = 1; //seconds
+const int GRAPH_UPDATE_DELAY = 2; //seconds
 
 //STATIC VARIABLES
 static HANDLE hDevice;
@@ -35,8 +31,6 @@ int num_saved = 0;
 //FUNCTION BODIES
 int main(int argc, char **argv)
 {
-    signal(SIGINT, INThandler);
-
     ar_time = (double*)malloc(ar_len*sizeof(double));
     ar_temp = (double*)malloc(ar_len*sizeof(double));
 
@@ -68,6 +62,12 @@ int main(int argc, char **argv)
     printf("                            Pressure");
 	printf("\n");
 	double time_since_last_save = 0;
+
+    //graphing
+    clock_t last_graph_update = -10000; //arbitrary small negative number
+
+    //misc
+    int num_samples = 0;
 	while(true)
 	{
         //Update standard output
@@ -91,6 +91,7 @@ int main(int argc, char **argv)
 			printf("  %6.1f", temperature(voltages[channel], channel)-CELCIUS_TO_KELVIN);
 		printf("\n");
 		printf("Pressure  (PSI)                                                          %5.1f\n", pressure(voltages[7]));
+        printf("Sample #%d\n", ++num_samples);
 
         //Calculate temperatures
 		double temperatures[4];
@@ -126,6 +127,11 @@ int main(int argc, char **argv)
         ar_time[num_saved] = num_saved;
         ++num_saved;
 
+        if(clock() >= CLOCKS_PER_SEC*GRAPH_UPDATE_DELAY + last_graph_update)
+        {
+            flash_animation(ar_time, ar_temp, num_saved, GRAPH_UPDATE_DELAY);
+            last_graph_update = clock();
+        }
         /*        
         //Update graph
         if(num_saved >= ar_len-2)
@@ -140,7 +146,7 @@ int main(int argc, char **argv)
         //Pause before updating screen
 		clock_t goal = CLOCKS_PER_SEC/UPDATES_PER_SECOND + clock();
 		while (goal > clock());
-		for(int i=0; i<5; ++i)
+		for(int i=0; i<6; ++i)
 				fputs("\033[A\033[2K",stdout);
 		configIO = 0;
 	}
@@ -228,12 +234,4 @@ const double PRESSURE_RANGE = 200.0; //(PSI)
 double pressure(double voltage)
 {
 	return PRESSURE_RANGE*((voltage-PRESSURE_VOLTAGE_OFFSET)/VOLTAGE_RANGE);
-}
-
-//Frees dynamically allocated memory in the case of a Ctrl+C
-void INThandler(int sig)
-{
-    free(ar_time);
-    free(ar_temp);
-    exit(0);
 }
