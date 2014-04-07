@@ -15,7 +15,7 @@ int flash_animation(double x[], double y[], int n, int update_delay);
 //private
 int create_script(double x[], double y[], int n, int update_delay);
 void INThandler(int);
-static pid_t pID;
 void cleanup();
+int pID;
 
 #endif

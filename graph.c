@@ -1,13 +1,13 @@
 #include "graph.h"
 
 int update_delay = 3;
-const char* ROOT_FILE_NAME = "graph.C";
+const char* ROOT_FILE_NAME = "temp_graph.C";
 
 //The graph will be displayed for a tiem equal to the update_delay
 int flash_animation(double x[], double y[], int n, int update_delay)
 {
     signal(SIGINT, INThandler);
-    pID = fork();
+    int pID = fork();
     if(pID==0)
     {
         create_script(x,y,n, update_delay);
@@ -16,29 +16,29 @@ int flash_animation(double x[], double y[], int n, int update_delay)
     return 0;
 }
 
+//Constant strings for writing root file
 const char BEGINNING[] = 
     "#include<unistd.h>\n"
-    "void graph() {\n"
-    "TCanvas *c1 = new TCanvas(\"c1\", \"Temperature\", 200, 10, 700, 500);\n"
+    "void temp_graph() {\n"
+    "TCanvas *c1 = new TCanvas(\"c1\", \"Temperature\", 10, 10, 700, 500);\n"
     "c1->SetFillColor(42);\n"
     "c1->SetGrid();\n";
-//arrays
+    //root file arrays go here
 const char MIDDLE[] =
     "gr = new TGraph(n, x, y);\n"
     "gr->SetLineColor(2);\n"
     "gr->SetLineWidth(4);\n"
     "gr->SetMarkerColor(4);\n"
     "gr->SetMarkerStyle(21);\n"
-    "gr->SetTitle(\"a simple graph\");\n"
+    "gr->SetTitle(\"Graph of temperature\");\n"
     "gr->GetXaxis()->SetTitle(\"Time\");\n"
     "gr->GetYaxis()->SetTitle(\"Temperature\");\n"
     "gr->Draw(\"ACP\");\n"
-    // TCanvas::Update() draws the frame, after which one can change it
-    "c1->Update();\n"
+    "c1->Update();\n" //this command draws the frame, after which one can change it
     "c1->GetFrame()->SetFillColor(21);\n"
     "c1->GetFrame()->SetBorderSize(12);\n"
     "c1->Modified();\n";
-//sleep
+    //root file sleep command goes here
 const char END[] = 
     "exit();\n"
     "}\n";
@@ -76,8 +76,6 @@ void INThandler(int sig)
 {
     signal(sig, SIG_IGN);
     cleanup();
-    printf("premature termination\n");
-    printf("death to the child\n");
     kill(pID, 1);
     exit(0);
 }

@@ -81,3 +81,10 @@ Channel 0:
 
 
 
+If you get the error
+   "libusb error: LIBUSB_ERROR_ACCESS
+    Open error: could not find a U3 with a local ID or serial number of -1
+    error: could not open USB connection."
+It is very likely because you did not give main the proper permissions. Run "do-suid" as sudo user to set these.
+
+
