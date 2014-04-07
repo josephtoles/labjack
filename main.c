@@ -12,8 +12,10 @@
 const int UPDATES_PER_SECOND = 10;
 const int NUM_CHANNELS = 8;
 const double CELCIUS_TO_KELVIN = 272.15;
-const int SAVE_DELAY = 60; //seconds
-const int GRAPH_UPDATE_DELAY = 4; //seconds //change this to something like 60 later.
+const int DISC_SAVE_DELAY = 6; //seconds //change this to something like 60
+const int GRAPH_REFRESH_DELAY = 7; //seconds //change this to something like 60 later.
+const int GRAPH_POINT_SAVE_DELAY = 2;
+const time_t PRESSURE_REFRESH_EPSILON = 50;
 
 //STATIC VARIABLES
 static HANDLE hDevice;
@@ -66,7 +68,7 @@ int main(int argc, char **argv)
 	double time_since_last_save = 0;
 
     //graphing
-    clock_t last_graph_update = -GRAPH_UPDATE_DELAY*CLOCKS_PER_SEC; //arbitrary small negative number
+    clock_t last_graph_update = -GRAPH_REFRESH_DELAY*CLOCKS_PER_SEC; //arbitrary small negative number
 
     //misc
     int num_samples = 0;
@@ -103,7 +105,7 @@ int main(int argc, char **argv)
 			temperatures[i] = temperature(voltages[i], i);
 
         //Save to disc
-        if(time_since_last_save > SAVE_DELAY)
+        if(time_since_last_save > DISC_SAVE_DELAY)
 		{
 			time_since_last_save = 0;
 			save_datum(temperatures, pressure(voltages[7]));
@@ -134,23 +136,28 @@ int main(int argc, char **argv)
     
             ar_len *= 2;
         }
-        ar_temp[num_saved] = temperatures[0];
-        ar_pres[num_saved] = pressure(voltages[7]);
-        ar_time[num_saved] = num_saved;
-        ++num_saved;
+        static clock_t last_graph_point_save = 0;
+        if(clock() > last_graph_point_save+GRAPH_POINT_SAVE_DELAY*CLOCKS_PER_SEC)
+        {
+            ar_temp[num_saved] = temperatures[0];
+            ar_pres[num_saved] = pressure(voltages[7]);
+            ar_time[num_saved] = num_saved;
+            ++num_saved;
+            last_graph_point_save = clock();
+        }
 
         //Update graph
-        if(clock() >= CLOCKS_PER_SEC*GRAPH_UPDATE_DELAY + last_graph_update)
+        if(clock() >= CLOCKS_PER_SEC*GRAPH_REFRESH_DELAY + last_graph_update + PRESSURE_REFRESH_EPSILON)
         {
-            flash_temp_animation(ar_time, ar_temp, num_saved, GRAPH_UPDATE_DELAY);
+            flash_temp_animation(ar_time, ar_temp, num_saved, GRAPH_REFRESH_DELAY);
+            flash_pres_animation(ar_time, ar_pres, num_saved, GRAPH_REFRESH_DELAY);
             last_graph_update = clock();
         }
 
         //Pause before updating screen
 		clock_t goal = CLOCKS_PER_SEC/UPDATES_PER_SECOND + clock();
 		while (goal > clock());
-		for(int i=0; i<6; ++i)
-				fputs("\033[A\033[2K",stdout);
+		for(int i=0; i<6; ++i) fputs("\033[A\033[2K",stdout); //clear lines
 		configIO = 0;
 	}
 

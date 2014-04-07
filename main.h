@@ -3,6 +3,7 @@
 
 #include "record_data.h"
 #include "temp_graph.h"
+#include "pres_graph.h"
 #include "u3.h"
 
 #include <signal.h>
