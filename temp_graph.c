@@ -4,7 +4,7 @@ const char* TEMP_ROOT_FILE_NAME = "temp_graph.C";
 int pID;
 
 //private functions
-int create_temp_script(double x[], double y[], int n, int update_delay);
+int create_temp_script(double x[], double* y[4], int n, int update_delay);
 void temp_int_handler(int);
 void temp_cleanup();
 void add_graph(FILE* f, int index, double x[], double y[], int n);
@@ -16,7 +16,7 @@ int flash_temp_animation(double x[], double* y[4], int n, int update_delay)
     int pID = fork();
     if(pID==0)
     {
-        create_temp_script(x,y[0],n, update_delay); //modify to allow multiple arrays
+        create_temp_script(x,y,n, update_delay); //modify to allow multiple arrays
         exit(0);
     }
     return 0;
@@ -92,7 +92,7 @@ void add_graph(FILE* f, int index, double x[], double y[], int n)
 }
 
 
-int create_temp_script(double x[], double y[], int n, int update_delay)
+int create_temp_script(double x[], double* y[4], int n, int update_delay)
 {
     //open file
     FILE *f = fopen(TEMP_ROOT_FILE_NAME, "w");
@@ -106,8 +106,8 @@ int create_temp_script(double x[], double y[], int n, int update_delay)
     fprintf(f, TEMP_BEGINNING);
 
     //graphs
-    for(int i=1; i<=2; ++i)
-        add_graph(f, i, x, y, n);
+    for(int i=0; i<4; ++i)
+        add_graph(f, i, x, y[i], n);
 
     //middle
     fprintf(f, TEMP_MIDDLE);
