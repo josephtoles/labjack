@@ -16,6 +16,7 @@ const int DISC_SAVE_DELAY = 6; //seconds //change this to something like 60
 const int GRAPH_REFRESH_DELAY = 7; //seconds //change this to something like 60 later.
 const int GRAPH_POINT_SAVE_DELAY = 2;
 const time_t PRESSURE_REFRESH_EPSILON = 50;
+const int NUM_RTDS = 4;
 
 //STATIC VARIABLES
 static HANDLE hDevice;
@@ -25,18 +26,19 @@ static long error = 0;
 static long DAC1Enable;
 
 //DYNAMIC MEMORY
-double* ar_temp; //temperature
+double* ar_temp[4]; //temperature //4 is equal to NUM_RTDs. Figure out how to automate this.
 double* ar_pres; //pressure
 double* ar_time; //time
 int ar_len = 10; //dynamic memory array length
-int num_saved = 0;
+int points_in_graph = 0;
 
 //FUNCTION BODIES
 int main(int argc, char **argv)
 {
     ar_time = (double*)malloc(ar_len*sizeof(double));
     ar_pres = (double*)malloc(ar_len*sizeof(double));
-    ar_temp = (double*)malloc(ar_len*sizeof(double));
+    for(int i=0; i<NUM_RTDS; ++i)
+        ar_temp[i] = (double*)malloc(ar_len*sizeof(double));
 
 	create_record();
 
@@ -59,7 +61,6 @@ int main(int argc, char **argv)
 	for(int i=0; i<NUM_CHANNELS; ++i)
 		printf("     Ch%d", i);
     printf("\n");
-    const int NUM_RTDS = 4;
 	printf("              ");
     for(int i=0; i<NUM_RTDS; ++i)
         printf("    RTD%d", i);
@@ -97,7 +98,7 @@ int main(int argc, char **argv)
 			printf("  %6.1f", temperature(voltages[channel], channel)-CELCIUS_TO_KELVIN);
 		printf("\n");
 		printf("Pressure  (PSI)                                                          %5.1f\n", pressure(voltages[7]));
-        printf("Sample #%d. Total %d samples saved.\n", ++num_samples, samples_saved);
+        printf("Sample #%d. Total %d samples saved to disk. Total %d points on graph.\n", ++num_samples, samples_saved, points_in_graph);
 
         //Calculate temperatures
 		double temperatures[4];
@@ -114,7 +115,7 @@ int main(int argc, char **argv)
 		time_since_last_save += 1.0/UPDATES_PER_SECOND;
 
         //Arrays, graph, dynamic memory
-        if(num_saved == ar_len) //arrays are full
+        if(points_in_graph == ar_len) //arrays are full
         {
             double* n_ar_time = (double*)malloc(2*ar_len*sizeof(double));
             for(int i=0; i<ar_len; ++i)
@@ -127,30 +128,34 @@ int main(int argc, char **argv)
                 n_ar_pres[i] = ar_pres[i];
             free(ar_pres);
             ar_pres = n_ar_pres;
-    
-            double* n_ar_temp= (double*)malloc(2*ar_len*sizeof(double));
-            for(int i=0; i<ar_len; ++i)
-                n_ar_temp[i] = ar_temp[i];
-            free(ar_temp);
-            ar_temp = n_ar_temp;
+            
+            for(int i=0; i<NUM_RTDS; ++i)
+            {
+                double* n_ar_temp = (double*)malloc(2*ar_len*sizeof(double));
+                for(int j=0; j<ar_len; ++j)
+                    n_ar_temp[j] = ar_temp[i][j];
+                free(ar_temp[i]);
+                ar_temp[i] = n_ar_temp;
+            }
     
             ar_len *= 2;
         }
         static clock_t last_graph_point_save = 0;
         if(clock() > last_graph_point_save+GRAPH_POINT_SAVE_DELAY*CLOCKS_PER_SEC)
         {
-            ar_temp[num_saved] = temperatures[0];
-            ar_pres[num_saved] = pressure(voltages[7]);
-            ar_time[num_saved] = num_saved;
-            ++num_saved;
+            for(int i=0; i<NUM_RTDS; ++i)
+                ar_temp[i][points_in_graph] = temperatures[i];
+            ar_pres[points_in_graph] = pressure(voltages[7]);
+            ar_time[points_in_graph] = points_in_graph;
+            ++points_in_graph;
             last_graph_point_save = clock();
         }
 
         //Update graph
         if(clock() >= CLOCKS_PER_SEC*GRAPH_REFRESH_DELAY + last_graph_update + PRESSURE_REFRESH_EPSILON)
         {
-            flash_temp_animation(ar_time, ar_temp, num_saved, GRAPH_REFRESH_DELAY);
-            flash_pres_animation(ar_time, ar_pres, num_saved, GRAPH_REFRESH_DELAY);
+            flash_temp_animation(ar_time, ar_temp, points_in_graph, GRAPH_REFRESH_DELAY);
+            flash_pres_animation(ar_time, ar_pres, points_in_graph, GRAPH_REFRESH_DELAY);
             last_graph_update = clock();
         }
 

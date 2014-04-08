@@ -10,13 +10,13 @@ void temp_cleanup();
 void add_graph(FILE* f, int index, double x[], double y[], int n);
 
 //The graph will be displayed for a time equal to the update_delay
-int flash_temp_animation(double x[], double y[], int n, int update_delay)
+int flash_temp_animation(double x[], double* y[4], int n, int update_delay)
 {
     signal(SIGINT, temp_int_handler);
     int pID = fork();
     if(pID==0)
     {
-        create_temp_script(x,y,n, update_delay);
+        create_temp_script(x,y[0],n, update_delay); //modify to allow multiple arrays
         exit(0);
     }
     return 0;

@@ -10,6 +10,6 @@
 //Graph updates exactly once per second
 
 //public
-int flash_temp_animation(double x[], double y[], int n, int update_delay);
+int flash_temp_animation(double x[], double* y[4], int n, int update_delay);
 
 #endif
