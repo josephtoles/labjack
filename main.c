@@ -12,8 +12,8 @@
 const int UPDATES_PER_SECOND = 10;
 const int NUM_CHANNELS = 8;
 const double CELCIUS_TO_KELVIN = 272.15;
-const int DISC_SAVE_DELAY = 60; //seconds
-const int GRAPH_REFRESH_DELAY = 60; //seconds, don't lower substantially below 7
+const int DISC_SAVE_DELAY = 2; //seconds (Use 2 for testing, 60 for production)
+const int GRAPH_REFRESH_DELAY = 10; //seconds (Use 10 for testing, 60 for production. Do not lower much below 7.)
 const int GRAPH_POINT_SAVE_DELAY = 2; //seconds
 const time_t PRESSURE_REFRESH_EPSILON = 50; //clock_t
 const int NUM_RTDS = 4;
@@ -24,6 +24,7 @@ static u3CalibrationInfo caliInfo;
 static int localID = -1;
 static long error = 0;
 static long DAC1Enable;
+static bool text_mode = false; //don't display graphs
 
 //DYNAMIC MEMORY
 double* ar_temp[4]; //temperature //4 is equal to NUM_RTDs. Figure out how to variable-ize this number.
@@ -35,6 +36,22 @@ int points_in_graph = 0;
 //FUNCTION BODIES
 int main(int argc, char **argv)
 {
+    //flags
+    int c;
+    extern char *optarg;
+    extern int optind, optopt, opterr;
+    while ((c = getopt(argc, argv, ":t")) != -1) {
+        switch(c) {
+        case 't':
+            printf("Text mode engaged. No graphs will be displayed.\n");
+            text_mode = true;
+            break;
+        case '?':
+            printf("unknown arg %c\n", optopt);
+        break;
+        }
+    }
+
     ar_time = (double*)malloc(ar_len*sizeof(double));
     ar_pres = (double*)malloc(ar_len*sizeof(double));
     for(int i=0; i<NUM_RTDS; ++i)
@@ -66,7 +83,7 @@ int main(int argc, char **argv)
         printf("    RTD%d", i);
     printf("                            Pressure");
 	printf("\n");
-	double time_since_last_save = 0;
+	time_t last_disc_save_time = 0;
 
     //graphing
     clock_t last_graph_update = -GRAPH_REFRESH_DELAY*CLOCKS_PER_SEC; //arbitrary small negative number
@@ -106,60 +123,62 @@ int main(int argc, char **argv)
 			temperatures[i] = temperature(voltages[i], i);
 
         //Save to disc
-        if(time_since_last_save > DISC_SAVE_DELAY*CLOCKS_PER_SEC)
+        if(clock() > last_disc_save_time + DISC_SAVE_DELAY*CLOCKS_PER_SEC)
 		{
-			time_since_last_save = 0;
-			save_datum(temperatures, pressure(voltages[7]));
+			last_disc_save_time = clock();
+			save_datum(temperatures, pressure(voltages[7]), voltages);
             ++samples_saved;
 		}
-		time_since_last_save += 1.0/UPDATES_PER_SECOND;
 
-        //Arrays, graph, dynamic memory
-        if(points_in_graph == ar_len) //arrays are full
+        if(!text_mode)
         {
-            double* n_ar_time = (double*)malloc(2*ar_len*sizeof(double));
-            for(int i=0; i<ar_len; ++i)
-                n_ar_time[i] = ar_time[i];
-            free(ar_time);
-            ar_time = n_ar_time;
-    
-            double* n_ar_pres = (double*)malloc(2*ar_len*sizeof(double));
-            for(int i=0; i<ar_len; ++i)
-                n_ar_pres[i] = ar_pres[i];
-            free(ar_pres);
-            ar_pres = n_ar_pres;
-            
-            for(int i=0; i<NUM_RTDS; ++i)
+            //Arrays, graph, dynamic memory
+            if(points_in_graph == ar_len) //arrays are full
             {
-                double* n_ar_temp = (double*)malloc(2*ar_len*sizeof(double));
-                for(int j=0; j<ar_len; ++j)
-                    n_ar_temp[j] = ar_temp[i][j];
-                free(ar_temp[i]);
-                ar_temp[i] = n_ar_temp;
+                double* n_ar_time = (double*)malloc(2*ar_len*sizeof(double));
+                for(int i=0; i<ar_len; ++i)
+                    n_ar_time[i] = ar_time[i];
+                free(ar_time);
+                ar_time = n_ar_time;
+        
+                double* n_ar_pres = (double*)malloc(2*ar_len*sizeof(double));
+                for(int i=0; i<ar_len; ++i)
+                    n_ar_pres[i] = ar_pres[i];
+                free(ar_pres);
+                ar_pres = n_ar_pres;
+                
+                for(int i=0; i<NUM_RTDS; ++i)
+                {
+                    double* n_ar_temp = (double*)malloc(2*ar_len*sizeof(double));
+                    for(int j=0; j<ar_len; ++j)
+                        n_ar_temp[j] = ar_temp[i][j];
+                    free(ar_temp[i]);
+                    ar_temp[i] = n_ar_temp;
+                }
+        
+                ar_len *= 2;
+            }
+            static clock_t last_graph_point_save = 0;
+            if(clock() > last_graph_point_save+GRAPH_POINT_SAVE_DELAY*CLOCKS_PER_SEC)
+            {
+                for(int i=0; i<NUM_RTDS; ++i)
+                    ar_temp[i][points_in_graph] = temperatures[i];
+                ar_pres[points_in_graph] = pressure(voltages[7]);
+                ar_time[points_in_graph] = points_in_graph;
+                ++points_in_graph;
+                last_graph_point_save = clock();
             }
     
-            ar_len *= 2;
-        }
-        static clock_t last_graph_point_save = 0;
-        if(clock() > last_graph_point_save+GRAPH_POINT_SAVE_DELAY*CLOCKS_PER_SEC)
-        {
-            for(int i=0; i<NUM_RTDS; ++i)
-                ar_temp[i][points_in_graph] = temperatures[i];
-            ar_pres[points_in_graph] = pressure(voltages[7]);
-            ar_time[points_in_graph] = points_in_graph;
-            ++points_in_graph;
-            last_graph_point_save = clock();
+            //Update graph
+            if(clock() >= CLOCKS_PER_SEC*GRAPH_REFRESH_DELAY + last_graph_update + PRESSURE_REFRESH_EPSILON)
+            {
+                flash_temp_animation(ar_time, ar_temp, points_in_graph, GRAPH_REFRESH_DELAY);
+                flash_pres_animation(ar_time, ar_pres, points_in_graph, GRAPH_REFRESH_DELAY);
+                last_graph_update = clock();
+            }
         }
 
-        //Update graph
-        if(clock() >= CLOCKS_PER_SEC*GRAPH_REFRESH_DELAY + last_graph_update + PRESSURE_REFRESH_EPSILON)
-        {
-            flash_temp_animation(ar_time, ar_temp, points_in_graph, GRAPH_REFRESH_DELAY);
-            flash_pres_animation(ar_time, ar_pres, points_in_graph, GRAPH_REFRESH_DELAY);
-            last_graph_update = clock();
-        }
-
-        //Pause before updating screen
+        //Pause before updating screen standard output
 		clock_t goal = CLOCKS_PER_SEC/UPDATES_PER_SECOND + clock();
 		while (goal > clock());
 		for(int i=0; i<6; ++i) fputs("\033[A\033[2K",stdout); //clear lines

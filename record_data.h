@@ -5,7 +5,7 @@
 #include <string.h>
 #include <time.h>
 
-void save_datum(double temperatures[4], double pressure_k);
+void save_datum(double temperatures[4], double pressure_k, double voltages[8]);
 void create_record();
 
 #endif

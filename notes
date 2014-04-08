@@ -8,8 +8,6 @@ https://muon.npl.washington.edu/elog/musun/UW+lab+work/329
 
 Calibrate pressure sensor with a voltage generator
 
-Modify program to record raw voltage, resistance
-
 
 0.4/0.5 (PSI) should be zero
     0.015V read by box
@@ -19,5 +17,4 @@ Modify program to record raw voltage, resistance
 When exactly 2V is put into the box, 50.3PSI comes out of the terminal. This is probably because the box needs some calibration.
 
 
-Start a measurement before you leave today.
 
