@@ -26,22 +26,20 @@ const char PRES_BEGINNING[] =
     "#include<unistd.h>\n"
     "void pres_graph() {\n"
     "TCanvas *c1 = new TCanvas(\"c1\", \"Pressure\", 10, 530, 700, 450);\n"
-    "c1->SetFillColor(42);\n"
+    //"c1->SetFillColor(42);\n"
     "c1->SetGrid();\n";
     //root file arrays go here
 const char PRES_MIDDLE[] =
     "gr = new TGraph(n, x, y);\n"
-    "gr->SetLineColor(2);\n"
-    "gr->SetLineWidth(4);\n"
-    "gr->SetMarkerColor(4);\n"
-    "gr->SetMarkerStyle(21);\n"
-    "gr->SetTitle(\"Graph of temperature\");\n"
+    //"gr->SetLineColor(2);\n"
+    //"gr->SetLineWidth(4);\n"
+    "gr->SetMarkerColor(1);\n"
+    "gr->SetMarkerStyle(20);\n"
+    "gr->SetTitle(\"Graph of pressure\");\n"
     "gr->GetXaxis()->SetTitle(\"Time\");\n"
     "gr->GetYaxis()->SetTitle(\"Pressure\");\n"
-    "gr->Draw(\"ACP\");\n"
+    "gr->Draw(\"ALP\");\n"
     "c1->Update();\n" //this command draws the frame, after which one can change it
-    "c1->GetFrame()->SetFillColor(21);\n"
-    "c1->GetFrame()->SetBorderSize(12);\n"
     "c1->Modified();\n";
     //root file sleep command goes here
 const char PRES_END[] = 

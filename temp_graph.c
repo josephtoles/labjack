@@ -1,13 +1,18 @@
 #include "temp_graph.h"
 
+//constants
 const char* TEMP_ROOT_FILE_NAME = "temp_graph.C";
-int pID;
+const int MARKER_STYLES[4] = {20, 20, 20, 20};
+const int MARKER_COLORS[4] = {2, 3, 4, 28};
 
 //private functions
 int create_temp_script(double x[], double* y[4], int n, int update_delay);
 void temp_int_handler(int);
 void temp_cleanup();
 void add_graph(FILE* f, int index, double x[], double y[], int n);
+
+//variables
+int pID;
 
 //The graph will be displayed for a time equal to the update_delay
 int flash_temp_animation(double x[], double* y[4], int n, int update_delay)
@@ -35,7 +40,8 @@ const char TEMP_BEGINNING[] =
    
 
 const char TEMP_MIDDLE[] = 
-    "mg->Draw(\"ap\");\n"
+    //"mg->Draw(\"ap\");\n"
+    "mg->Draw(\"ALP\");\n"
     "c1->Update();\n";
 
     /* root file sleep command goes here */
@@ -43,26 +49,6 @@ const char TEMP_MIDDLE[] =
 const char TEMP_END[] = 
     "exit();\n"
     "}\n";
-
-//tracer only
-const char GRAPHS[] = 
-"const Int_t n1 = 10;\n"
-"Double_t x1[]  = {-0.1, 0.05, 0.25, 0.35, 0.5, 0.61,0.7,0.85,0.89,0.95};\n"
-"Double_t y1[]  = {-1,2.9,5.6,7.4,9,9.6,8.7,6.3,4.5,1};\n"
-"TGraph *gr1 = new TGraph(n1,x1,y1);\n"
-"gr1->SetMarkerColor(kBlue);\n"
-"gr1->SetMarkerStyle(21);\n"
-"gr1->Fit(\"pol6\",\"q\");\n"
-"mg->Add(gr1);\n"
-""
-"const Int_t n2 = 10;"
-"Float_t x2[]  = {-0.28, 0.005, 0.19, 0.29, 0.45, 0.56,0.65,0.80,0.90,1.01};"
-"Float_t y2[]  = {2.1,3.86,7,9,10,10.55,9.64,7.26,5.42,2};"
-"TGraph *gr2 = new TGraph(n2,x2,y2);"
-"gr2->SetMarkerColor(kRed);"
-"gr2->SetMarkerStyle(20);"
-"gr2->Fit(\"pol5\",\"q\");"
-"mg->Add(gr2);\n";
 
 void add_graph(FILE* f, int index, double x[], double y[], int n)
 {
@@ -84,11 +70,10 @@ void add_graph(FILE* f, int index, double x[], double y[], int n)
     }
     fprintf(f, "};\n");
     fprintf(f, "TGraph *gr%d = new TGraph(n%d,x%d,y%d);\n", index, index, index, index);
-    fprintf(f, "gr%d->SetMarkerColor(kBlue);\n", index);
-    fprintf(f, "gr%d->SetMarkerStyle(21);\n", index);
-    fprintf(f, "gr%d->Fit(\"pol6\",\"q\");\n", index);
+    fprintf(f, "gr%d->SetMarkerColor(%d);\n", index, MARKER_COLORS[index]);
+    fprintf(f, "gr%d->SetLineColor(%d);\n", index, MARKER_COLORS[index]);
+    fprintf(f, "gr%d->SetMarkerStyle(%d);\n", index, MARKER_STYLES[index]);
     fprintf(f, "mg->Add(gr%d);\n", index);
-
 }
 
 

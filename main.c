@@ -12,10 +12,10 @@
 const int UPDATES_PER_SECOND = 10;
 const int NUM_CHANNELS = 8;
 const double CELCIUS_TO_KELVIN = 272.15;
-const int DISC_SAVE_DELAY = 6; //seconds //change this to something like 60
-const int GRAPH_REFRESH_DELAY = 7; //seconds //change this to something like 60 later.
-const int GRAPH_POINT_SAVE_DELAY = 2;
-const time_t PRESSURE_REFRESH_EPSILON = 50;
+const int DISC_SAVE_DELAY = 60; //seconds
+const int GRAPH_REFRESH_DELAY = 60; //seconds, don't lower substantially below 7
+const int GRAPH_POINT_SAVE_DELAY = 2; //seconds
+const time_t PRESSURE_REFRESH_EPSILON = 50; //clock_t
 const int NUM_RTDS = 4;
 
 //STATIC VARIABLES
@@ -26,7 +26,7 @@ static long error = 0;
 static long DAC1Enable;
 
 //DYNAMIC MEMORY
-double* ar_temp[4]; //temperature //4 is equal to NUM_RTDs. Figure out how to automate this.
+double* ar_temp[4]; //temperature //4 is equal to NUM_RTDs. Figure out how to variable-ize this number.
 double* ar_pres; //pressure
 double* ar_time; //time
 int ar_len = 10; //dynamic memory array length
@@ -106,7 +106,7 @@ int main(int argc, char **argv)
 			temperatures[i] = temperature(voltages[i], i);
 
         //Save to disc
-        if(time_since_last_save > DISC_SAVE_DELAY)
+        if(time_since_last_save > DISC_SAVE_DELAY*CLOCKS_PER_SEC)
 		{
 			time_since_last_save = 0;
 			save_datum(temperatures, pressure(voltages[7]));
