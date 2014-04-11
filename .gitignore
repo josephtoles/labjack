@@ -3,3 +3,5 @@ main
 *.o
 data*
 *.swp
+analysis
+2014*
