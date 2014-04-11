@@ -115,7 +115,7 @@ int main(int argc, char **argv)
 			printf("  %6.1f", temperature(voltages[channel], channel)-CELCIUS_TO_KELVIN);
 		printf("\n");
 		printf("Pressure  (PSI)                                                          %5.1f\n", pressure(voltages[7]));
-        printf("Sample #%d. Total %d samples saved to disk. Total %d points on graph.\n", ++num_samples, samples_saved, points_in_graph);
+        //printf("Sample #%d. Total %d samples saved to disk. Total %d points on graph.\n", ++num_samples, samples_saved, points_in_graph);
 
         //Calculate temperatures
 		double temperatures[4];
@@ -181,7 +181,7 @@ int main(int argc, char **argv)
         //Pause before updating screen standard output
 		clock_t goal = CLOCKS_PER_SEC/UPDATES_PER_SECOND + clock();
 		while (goal > clock());
-		for(int i=0; i<6; ++i) fputs("\033[A\033[2K",stdout); //clear lines
+		for(int i=0; i<5; ++i) fputs("\033[A\033[2K",stdout); //clear lines
 		configIO = 0;
 	}
 
