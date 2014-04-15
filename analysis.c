@@ -69,14 +69,15 @@ int main(int argc, char** argv)
             break;
         }
     }
-    if(!disp_temperature && !disp_pressure && !disp_voltage)
+    //Default no options setting
+    if(!disp_temperature && !disp_pressure)
         disp_temperature = true;
 
     FILE* f = fopen(file_name, "r");
     if(f == NULL)
         printf("Could not open file %s.\n", file_name);
 
-    //ignore first line //works
+    //ignore first line
     char mark = getc(f);
     while(mark != '\n') {
         mark = getc(f);
@@ -127,7 +128,7 @@ int main(int argc, char** argv)
 
     //input arrays here
     fprintf(f, "const Int_t n = %d;\n", n);
-    if(disp_temperature && ! disp_voltage)
+    if(disp_temperature)
     {
         for(int i=0; i<NUM_RTDS; ++i)
         {
@@ -144,8 +145,10 @@ int main(int argc, char** argv)
             fprintf(f, "Double_t y%d[] = {", i);
             for(int j=0; j<n; ++j)
             {
-                //Make this better once you implement timestamps
-                fprintf(f, "%f", samples[j].rtd[i]);
+                if(disp_voltage)
+                    fprintf(f, "%f", samples[j].rtd_v[i]);
+                else
+                    fprintf(f, "%f", samples[j].rtd[i]);
                 if(j!=n-1)
                     fprintf(f, ",");
             }
@@ -156,7 +159,7 @@ int main(int argc, char** argv)
             fprintf(f, "mg->Add(gr%d);\n", i);
         }
     }
-    else if(disp_pressure && ! disp_voltage)
+    if(disp_pressure)
     {
         fprintf(f, "Double_t xp[] = {");
         for(int j=0; j<n; ++j)
@@ -171,8 +174,10 @@ int main(int argc, char** argv)
         fprintf(f, "Double_t yp[] = {");
         for(int j=0; j<n; ++j)
         {
-            //Make this better once you implement timestamps
-            fprintf(f, "%f", samples[j].pressure);
+            if(disp_voltage)
+                fprintf(f, "%f", samples[j].pressure_v);
+            else
+                fprintf(f, "%f", samples[j].pressure);
             if(j!=n-1)
                 fprintf(f, ",");
         }
