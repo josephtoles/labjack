@@ -44,4 +44,4 @@ pres_graph: $(PRES_GRAPH_OBJ) $(AQUISITION_HDRS)
 	$(CC) -c $(CFLAGS) $(PRES_GRAPH_OBJ) $(LDFLAGS)
 
 clean:
-	rm -f *.o main *~ pt_control
+	rm -f *.o main *~ pt_control analysis

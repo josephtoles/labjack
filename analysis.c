@@ -7,6 +7,7 @@
 const char* ROOT_FILE_NAME = "graph.C";
 const char BEGINNING[];
 const char END[];
+const int NUM_RTDS = 4;
 
 struct sample
 {
@@ -84,9 +85,19 @@ int main(int argc, char** argv)
             &s.pressure,
             s.rtd_v, s.rtd_v+1, s.rtd_v+2, s.rtd_v+3,
             &s.pressure_v);
+        samples[n] = s;
         ++n;
     }
     fclose(f);
+    for(int i=0; i<n; ++i)
+    {
+        printf("Datapoint %d\n", i);
+        printf("Timestamp %s\n", samples[i].timestamp);
+        for(int j=0; j<4; ++j)
+            printf("RTD%d @ %f\n", j, samples[i].rtd[j]);
+        printf("Pressure %f\n", samples[i].pressure);
+
+    }
 
     f = fopen(ROOT_FILE_NAME, "w");
     if(f==NULL)
@@ -98,6 +109,34 @@ int main(int argc, char** argv)
     fprintf(f, BEGINNING);
 
     //input arrays here
+    fprintf(f, "const Int_t n = %d;\n", n);
+    for(int i=0; i<NUM_RTDS; ++i)
+    {
+        fprintf(f, "Double_t x%d[] = {", i);
+        for(int j=0; j<n; ++j)
+        {
+            //Make this better once you implement timestamps
+            fprintf(f, "%d", j);
+            if(j!=n-1)
+                fprintf(f, ",");
+        }
+        fprintf(f, "};\n");
+
+        fprintf(f, "Double_t y%d[] = {", i);
+        for(int j=0; j<n; ++j)
+        {
+            //Make this better once you implement timestamps
+            fprintf(f, "%f", samples[j].rtd[i]);
+            if(j!=n-1)
+                fprintf(f, ",");
+        }
+        fprintf(f, "};\n");
+        fprintf(f, "TGraph *gr%d = new TGraph(n,x%d,y%d);\n", i, i, i);
+        fprintf(f, "gr%d->SetMarkerColor(kBlue);\n", i); //make better
+        fprintf(f, "gr%d->SetMarkerStyle(%d);\n", i, i+20); //make better
+        fprintf(f, "gr%d->Fit(\"pol5\", \"q\");\n", i);
+        fprintf(f, "mg->Add(gr%d);\n", i);
+    }
 
     fprintf(f, END);
 
@@ -115,5 +154,4 @@ const char BEGINNING[] =
 const char END[] = 
     "mg->Draw(\"ALP\");\n"
     "c1->Update();\n"
-    "exit();\n"
     "}\n";
