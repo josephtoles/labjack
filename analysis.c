@@ -2,12 +2,15 @@
 #include <unistd.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 
 //constants
 const char* ROOT_FILE_NAME = "graph.C";
 const char BEGINNING[];
 const char END[];
 const int NUM_RTDS = 4;
+const int TEMP_MARKER_STYLES[4] = {20, 20, 20, 20};
+const int TEMP_MARKER_COLORS[4] = {2, 3, 4, 28};
 
 struct sample
 {
@@ -132,14 +135,17 @@ int main(int argc, char** argv)
         }
         fprintf(f, "};\n");
         fprintf(f, "TGraph *gr%d = new TGraph(n,x%d,y%d);\n", i, i, i);
-        fprintf(f, "gr%d->SetMarkerColor(kBlue);\n", i); //make better
-        fprintf(f, "gr%d->SetMarkerStyle(%d);\n", i, i+20); //make better
-        fprintf(f, "gr%d->Fit(\"pol5\", \"q\");\n", i);
+        fprintf(f, "gr%d->SetMarkerColor(%d);\n", i, TEMP_MARKER_COLORS[i]); //make better
+        fprintf(f, "gr%d->SetMarkerStyle(%d);\n", i, TEMP_MARKER_STYLES[i]); //make better
         fprintf(f, "mg->Add(gr%d);\n", i);
     }
 
     fprintf(f, END);
+    fclose(f);
 
+    char exit_command[30] = "root ";
+    strcat(exit_command, ROOT_FILE_NAME);
+    system(exit_command);
  
     return 0;
 }
