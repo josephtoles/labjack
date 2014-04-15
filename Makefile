@@ -26,9 +26,9 @@ AQUISITION_HDRS=$(wildcard *.h)
 CFLAGS +=-Wall -g
 LIBS=-lm -llabjackusb
 
-all: main analysis
-analysis: $(ANALYSIS_OBJ)
-	$(CC) -o analysis $(CFLAGS) $(ANALYSIS_OBJ) $(LDFLAGS) $(LIBS)
+all: main plot
+plot: $(ANALYSIS_OBJ)
+	$(CC) -o plot $(CFLAGS) $(ANALYSIS_OBJ) $(LDFLAGS) $(LIBS)
 
 main: $(AQUISITION_MAIN_OBJ) $(RECORD_DATA_OBJ) $(TEMP_GRAPH_OBJ) $(PRES_GRAPH_OBJ) $(AQUISITION_HDRS)
 	rm -f main

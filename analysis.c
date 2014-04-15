@@ -12,6 +12,12 @@ const int NUM_RTDS = 4;
 const int TEMP_MARKER_STYLES[4] = {20, 20, 20, 20};
 const int TEMP_MARKER_COLORS[4] = {2, 3, 4, 28};
 
+//Command line options
+//Default behavior: display temperature only
+// -v display voltages
+// -t display temperatures
+// -p display pressures
+
 struct sample
 {
     char timestamp[10];
@@ -23,6 +29,22 @@ struct sample
 
 int main(int argc, char** argv)
 {
+    //file access
+    char file_name[100] = "";
+    for(int i=1; i<argc; ++i)
+    {
+        if(argv[i][0] != '-')
+        {
+            strcpy(file_name, argv[i]);
+            break;
+        }
+    }
+    if(strcmp(file_name, "")==0)
+    {
+        printf("Please name a file to display.\n");
+        return -1;
+    }
+ 
     //flags
     int c;
     extern char *optarg;
@@ -30,9 +52,9 @@ int main(int argc, char** argv)
 
     bool disp_temperature = false;
     bool disp_pressure = false;
+    bool disp_voltage = false;
 
-
-    while ((c = getopt(argc, argv, ":t")) != -1) {
+    while ((c = getopt(argc, argv, ":tpv")) != -1) {
     switch(c) {
         case 't':
             disp_temperature = true;
@@ -40,17 +62,19 @@ int main(int argc, char** argv)
         case  'p':
             disp_pressure = true;
             break;
+        case 'v':
+            disp_voltage = true;
         case '?':
             printf("unknown arg %c\n", optopt);
             break;
         }
     }
+    if(!disp_temperature && !disp_pressure && !disp_voltage)
+        disp_temperature = true;
 
-    //file access
-    char* FILE_NAME = "2014-04-08_12:41:25";
-    FILE* f = fopen(FILE_NAME, "r");
+    FILE* f = fopen(file_name, "r");
     if(f == NULL)
-        printf("Could not open file %s.\n", FILE_NAME);
+        printf("Could not open file %s.\n", file_name);
 
     //ignore first line //works
     char mark = getc(f);
@@ -79,7 +103,6 @@ int main(int argc, char** argv)
         }
 
         //append data
-        printf("Scanning datapoint %d\n", n);
         struct sample s;
         fscanf(f,
             "%s %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
@@ -92,15 +115,6 @@ int main(int argc, char** argv)
         ++n;
     }
     fclose(f);
-    for(int i=0; i<n; ++i)
-    {
-        printf("Datapoint %d\n", i);
-        printf("Timestamp %s\n", samples[i].timestamp);
-        for(int j=0; j<4; ++j)
-            printf("RTD%d @ %f\n", j, samples[i].rtd[j]);
-        printf("Pressure %f\n", samples[i].pressure);
-
-    }
 
     f = fopen(ROOT_FILE_NAME, "w");
     if(f==NULL)
@@ -113,9 +127,38 @@ int main(int argc, char** argv)
 
     //input arrays here
     fprintf(f, "const Int_t n = %d;\n", n);
-    for(int i=0; i<NUM_RTDS; ++i)
+    if(disp_temperature && ! disp_voltage)
     {
-        fprintf(f, "Double_t x%d[] = {", i);
+        for(int i=0; i<NUM_RTDS; ++i)
+        {
+            fprintf(f, "Double_t x%d[] = {", i);
+            for(int j=0; j<n; ++j)
+            {
+                //Make this better once you implement timestamps
+                fprintf(f, "%d", j);
+                if(j!=n-1)
+                    fprintf(f, ",");
+            }
+            fprintf(f, "};\n");
+    
+            fprintf(f, "Double_t y%d[] = {", i);
+            for(int j=0; j<n; ++j)
+            {
+                //Make this better once you implement timestamps
+                fprintf(f, "%f", samples[j].rtd[i]);
+                if(j!=n-1)
+                    fprintf(f, ",");
+            }
+            fprintf(f, "};\n");
+            fprintf(f, "TGraph *gr%d = new TGraph(n,x%d,y%d);\n", i, i, i);
+            fprintf(f, "gr%d->SetMarkerColor(%d);\n", i, TEMP_MARKER_COLORS[i]);
+            fprintf(f, "gr%d->SetMarkerStyle(%d);\n", i, TEMP_MARKER_STYLES[i]);
+            fprintf(f, "mg->Add(gr%d);\n", i);
+        }
+    }
+    else if(disp_pressure && ! disp_voltage)
+    {
+        fprintf(f, "Double_t xp[] = {");
         for(int j=0; j<n; ++j)
         {
             //Make this better once you implement timestamps
@@ -125,25 +168,25 @@ int main(int argc, char** argv)
         }
         fprintf(f, "};\n");
 
-        fprintf(f, "Double_t y%d[] = {", i);
+        fprintf(f, "Double_t yp[] = {");
         for(int j=0; j<n; ++j)
         {
             //Make this better once you implement timestamps
-            fprintf(f, "%f", samples[j].rtd[i]);
+            fprintf(f, "%f", samples[j].pressure);
             if(j!=n-1)
                 fprintf(f, ",");
         }
         fprintf(f, "};\n");
-        fprintf(f, "TGraph *gr%d = new TGraph(n,x%d,y%d);\n", i, i, i);
-        fprintf(f, "gr%d->SetMarkerColor(%d);\n", i, TEMP_MARKER_COLORS[i]); //make better
-        fprintf(f, "gr%d->SetMarkerStyle(%d);\n", i, TEMP_MARKER_STYLES[i]); //make better
-        fprintf(f, "mg->Add(gr%d);\n", i);
+        fprintf(f, "TGraph *grp = new TGraph(n,xp,yp);\n");
+        fprintf(f, "grp->SetMarkerColor(%d);\n", 6);
+        fprintf(f, "grp->SetMarkerStyle(%d);\n", 20);
+        fprintf(f, "mg->Add(grp);\n");
     }
 
     fprintf(f, END);
     fclose(f);
 
-    char exit_command[30] = "root ";
+    char exit_command[30] = "root -l ";
     strcat(exit_command, ROOT_FILE_NAME);
     system(exit_command);
  
