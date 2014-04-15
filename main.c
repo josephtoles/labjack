@@ -217,7 +217,7 @@ double resistance(double voltage, int channel)
 		v0 = 0.116;
 		r0 = 21.1;
 		v1 = 1.977;
-		r1 = 90.6;
+		r1 = 98.6;
 		return (voltage-v0)*(r1-r0)/(v1-v0)+r0;
 	case 3:;
 		v0 = 0.117;
