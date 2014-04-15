@@ -4,3 +4,4 @@ main
 data*
 *.swp
 analysis
+*.C
