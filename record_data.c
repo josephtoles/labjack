@@ -38,7 +38,7 @@ void save_datum(double temperatures[4], double pressure_k, double voltages[8])
 	time(&rawtime);
 	struct tm* timeinfo;
 	timeinfo = localtime(&rawtime);
-	strftime (newline,80,"%H:%M:%S ",timeinfo);
+	strftime (newline,80,"%Y %m %d %H %M %S",timeinfo);
 
 	FILE* f = fopen(path, "a");
     fprintf(f, newline);
