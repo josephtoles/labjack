@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
 
 //constants
 const char* ROOT_FILE_NAME = "graph.C";
@@ -17,6 +18,8 @@ const int TEMP_MARKER_COLORS[4] = {2, 3, 4, 28};
 // -v display voltages
 // -t display temperatures
 // -p display pressures
+
+static int pID;
 
 struct sample
 {
@@ -191,10 +194,20 @@ int main(int argc, char** argv)
     fprintf(f, END);
     fclose(f);
 
-    char exit_command[30] = "root -l ";
-    strcat(exit_command, ROOT_FILE_NAME);
-    system(exit_command);
- 
+    char root_command[30] = "root -l ";
+    strcat(root_command, ROOT_FILE_NAME);
+    strcat(root_command, " &> /dev/null");
+    //system(root_command);
+   
+    //signal(SIGINT, int_handler);
+    pID = fork();
+    if(pID==0)
+    {
+        printf("executing root command\n");
+        system(root_command);
+        printf("root command executed\n");
+        exit(0);
+    }
     return 0;
 }
 
