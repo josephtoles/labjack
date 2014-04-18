@@ -18,6 +18,7 @@ const int TEMP_MARKER_COLORS[4] = {2, 3, 4, 28};
 // -v display voltages
 // -t display temperatures
 // -p display pressures
+// -f display fraction of pressure/temperature
 
 static int pID;
 
@@ -56,8 +57,9 @@ int main(int argc, char** argv)
     bool disp_temperature = false;
     bool disp_pressure = false;
     bool disp_voltage = false;
+    bool disp_fraction = false;
 
-    while ((c = getopt(argc, argv, ":tpv")) != -1) {
+    while ((c = getopt(argc, argv, ":tpvf")) != -1) {
     switch(c) {
         case 't':
             disp_temperature = true;
@@ -67,13 +69,17 @@ int main(int argc, char** argv)
             break;
         case 'v':
             disp_voltage = true;
+            break;
+        case 'f':
+            disp_fraction = true;
+            break;
         case '?':
             printf("unknown arg %c\n", optopt);
             break;
         }
     }
     //Default no options setting
-    if(!disp_temperature && !disp_pressure)
+    if(!disp_temperature && !disp_pressure && !disp_fraction)
         disp_temperature = true;
 
     FILE* f = fopen(file_name, "r");
@@ -152,6 +158,34 @@ int main(int argc, char** argv)
                     fprintf(f, "%f", samples[j].rtd_v[i]);
                 else
                     fprintf(f, "%f", samples[j].rtd[i]);
+                if(j!=n-1)
+                    fprintf(f, ",");
+            }
+            fprintf(f, "};\n");
+            fprintf(f, "TGraph *gr%d = new TGraph(n,x%d,y%d);\n", i, i, i);
+            fprintf(f, "gr%d->SetMarkerColor(%d);\n", i, TEMP_MARKER_COLORS[i]);
+            fprintf(f, "gr%d->SetMarkerStyle(%d);\n", i, TEMP_MARKER_STYLES[i]);
+            fprintf(f, "mg->Add(gr%d);\n", i);
+        }
+    }
+    if(disp_fraction)
+    {
+        for(int i=0; i<NUM_RTDS; ++i)
+        {
+            fprintf(f, "Double_t x%d[] = {", i);
+            for(int j=0; j<n; ++j)
+            {
+                //Make this better once you implement timestamps
+                fprintf(f, "%d", j);
+                if(j!=n-1)
+                    fprintf(f, ",");
+            }
+            fprintf(f, "};\n");
+    
+            fprintf(f, "Double_t y%d[] = {", i);
+            for(int j=0; j<n; ++j)
+            {
+                fprintf(f, "%f", samples[j].pressure / samples[j].rtd[i]);
                 if(j!=n-1)
                     fprintf(f, ",");
             }
