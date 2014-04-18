@@ -4,6 +4,7 @@
 #include "record_data.h"
 #include "temp_graph.h"
 #include "pres_graph.h"
+#include "calculations.h"
 #include "u3.h"
 
 #include <signal.h>
@@ -13,10 +14,10 @@
 #include <time.h>
 
 void close_connection();
-double kelvin(double v);
 int main(int argc, char **argv);
-double resistance(double voltage, int channel);
-double temperature(double voltage, int channel);
-double pressure(double voltage);
+
+//CONSTANTS
+const int NUM_CHANNELS = 8; 
+const double CELCIUS_TO_KELVIN = 272.15;
 
 #endif
