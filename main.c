@@ -1,11 +1,3 @@
-/**
- * @author Joseph Toles
- * @phone (425) 269-7168
- * @email jbtoles@gmail.com
- * @title LabJack pressure and temperature monitor
- * @date April 6, 2014
- */
-
 #include "main.h"
 
 //CONSTANTS

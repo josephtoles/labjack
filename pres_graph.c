@@ -16,7 +16,7 @@ int flash_pres_animation(double x[], double y[], int n, int update_delay)
     if(pID==0)
     {
         create_pres_script(x,y,n, update_delay);
-        exit(0);
+        return(0);
     }
     return 0;
 }

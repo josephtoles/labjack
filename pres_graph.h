@@ -1,5 +1,5 @@
-#ifndef GRAPH_H_
-#define GRAPH_H_
+#ifndef PRES_GRAPH_H_
+#define PRES_GRAPH_H_
 
 #include <stdio.h>
 #include <string.h>
