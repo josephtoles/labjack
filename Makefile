@@ -1,12 +1,11 @@
-#
-# Makefile for U3 examples
-#
-
 CC=gcc
 CFLAGS=-std=gnu99
 
-MAIN_SRC=main.c main.h u3.c
-MAIN_OBJ=$(MAIN_SRC:.c=.o)
+ANALYSIS_SRC=analysis.c
+ANALYSIS_OBJ=$(ANALYSIS_SRC:.c=.o)
+
+AQUISITION_MAIN_SRC=main.c main.h u3.c
+AQUISITION_MAIN_OBJ=$(AQUISITION_MAIN_SRC:.c=.o)
 
 RECORD_DATA_SRC=record_data.c record_data.h
 RECORD_DATA_OBJ=$(RECORD_DATA_SRC:.c=.o)
@@ -26,7 +25,10 @@ HDRS=$(wildcard *.h)
 CFLAGS +=-Wall -g
 LIBS=-lm -llabjackusb
 
-all: main
+all: main plot
+
+plot: $(ANALYSIS_OBJ)
+	$(CC) -o plot $(CFLAGS) $(ANALYSIS_OBJ) $(LDFLAGS) $(LIBS)
 
 main: $(MAIN_OBJ) $(RECORD_DATA_OBJ) $(TEMP_GRAPH_OBJ) $(PRES_GRAPH_OBJ) $(CALCULATIONS_OBJ) $(HDRS)
 	rm -f main
@@ -45,4 +47,4 @@ calculations: $(CALCULATIONS_OBJ) $(HDRS)
 	$(CC) -c $(CFLAGS) $(CALCULATIONS_OBJ) $(LDFLAGS)
 
 clean:
-	rm -f *.o main *~ pt_control
+	rm -f *.o main plot *~
