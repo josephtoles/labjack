@@ -17,7 +17,7 @@ void close_connection();
 int main(int argc, char **argv);
 
 //CONSTANTS
-const int NUM_CHANNELS = 8; 
-const double CELCIUS_TO_KELVIN = 272.15;
+extern const int NUM_CHANNELS;
+const double CELCIUS_TO_KELVIN;
 
 #endif

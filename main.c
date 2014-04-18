@@ -15,6 +15,8 @@ const int GRAPH_REFRESH_DELAY = 60; //seconds (Use 10 for testing, 60 for produc
 const int GRAPH_POINT_SAVE_DELAY = 60; //seconds
 const time_t PRESSURE_REFRESH_EPSILON = 50; //clock_t
 const int NUM_RTDS = 4;
+const int NUM_CHANNELS = 8;
+const double CELCIUS_TO_KELVIN = 272.15;
 
 //STATIC VARIABLES
 static HANDLE hDevice;
