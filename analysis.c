@@ -5,6 +5,8 @@
 #include <string.h>
 #include <signal.h>
 
+#include "calculations.h"
+
 //constants
 const char* ROOT_FILE_NAME = "graph.C";
 const char BEGINNING[];
@@ -19,6 +21,9 @@ const int TEMP_MARKER_COLORS[4] = {2, 3, 4, 28};
 // -t display temperatures
 // -p display pressures
 // -f display fraction of pressure/temperature
+// -r recalculate all data from voltages (use this when a new equation has been implemented)
+//        Note: doing so does not alter the original file
+//User must also specify a file with data
 
 static int pID;
 
@@ -58,6 +63,7 @@ int main(int argc, char** argv)
     bool disp_pressure = false;
     bool disp_voltage = false;
     bool disp_fraction = false;
+    bool recalculate = false;
 
     while ((c = getopt(argc, argv, ":tpvf")) != -1) {
     switch(c) {
@@ -72,6 +78,9 @@ int main(int argc, char** argv)
             break;
         case 'f':
             disp_fraction = true;
+            break;
+        case 'r':
+            recalculate = true;
             break;
         case '?':
             printf("unknown arg %c\n", optopt);
@@ -97,7 +106,7 @@ int main(int argc, char** argv)
     samples = (struct sample*)malloc(sizeof(struct sample)*samples_len);
 
     //read data
-    int n = 0;
+    int n = 0; //number of datums so far in sample array
     while(!feof(f))
     {
         //extend array size
@@ -125,6 +134,18 @@ int main(int argc, char** argv)
         ++n;
     }
     fclose(f);
+
+    if(recalculate)
+    {
+        for(int i=0; i<n; ++i)
+        {
+            for(int j=0; j<NUM_RTDS; ++j)
+            {
+                samples[i].rtd[j] = temperature(samples[i].rtd_v[j], j);
+            }
+            samples[i].pressure = pressure(samples[i].pressure_v);
+        }
+    }
 
     f = fopen(ROOT_FILE_NAME, "w");
     if(f==NULL)

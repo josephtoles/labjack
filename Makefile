@@ -27,9 +27,11 @@ LIBS=-lm -llabjackusb
 
 all: main plot
 
-plot: $(ANALYSIS_OBJ)
-	$(CC) -o plot $(CFLAGS) $(ANALYSIS_OBJ) $(LDFLAGS) $(LIBS)
+plot: $(ANALYSIS_OBJ) $(CALCULATIONS_OBJ) calculations.h
+	$(CC) -o plot $(CFLAGS) $(ANALYSIS_OBJ) $(CALCULATIONS_OBJ) $(LDFLAGS) $(LIBS)
 
+#The "rm -f main" command is used because of file permission issues
+#accessing the labjack
 main: $(AQUISITION_MAIN_OBJ) $(RECORD_DATA_OBJ) $(TEMP_GRAPH_OBJ) $(PRES_GRAPH_OBJ) $(CALCULATIONS_OBJ) $(HDRS)
 	rm -f main
 	$(CC) -o main $(CFLAGS) $(AQUISITION_MAIN_OBJ) $(RECORD_DATA_OBJ) $(TEMP_GRAPH_OBJ) $(PRES_GRAPH_OBJ) $(CALCULATIONS_OBJ) $(LDFLAGS) $(LIBS)

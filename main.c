@@ -17,6 +17,7 @@ static int localID = -1;
 static long error = 0;
 static long DAC1Enable;
 static bool text_mode = false; //don't display graphs
+static bool debug_mode = false; //display extra information
 
 //DYNAMIC MEMORY
 double* ar_temp[4]; //temperature //4 is equal to NUM_RTDs. Figure out how to variable-ize this number.
@@ -38,9 +39,12 @@ int main(int argc, char **argv)
             printf("Text mode engaged. No graphs will be displayed.\n");
             text_mode = true;
             break;
+        case 'd':
+            printf("Debug mode engaged. Displaying extra debugging information.\n");
+            debug_mode = true;
         case '?':
             printf("unknown arg %c\n", optopt);
-        break;
+            break;
         }
     }
 
@@ -107,7 +111,8 @@ int main(int argc, char **argv)
 			printf("  %6.1f", temperature(voltages[channel], channel)-CELCIUS_TO_KELVIN);
 		printf("\n");
 		printf("Pressure  (PSI)                                                          %5.1f\n", pressure(voltages[7]));
-        //printf("Sample #%d. Total %d samples saved to disk. Total %d points on graph.\n", ++num_samples, samples_saved, points_in_graph);
+        if(debug_mode)
+            printf("Sample #%d. Total %d samples saved to disk. Total %d points on graph.\n", ++num_samples, samples_saved, points_in_graph);
 
         //Calculate temperatures
 		double temperatures[4];
@@ -173,7 +178,9 @@ int main(int argc, char **argv)
         //Pause before updating screen standard output
 		clock_t goal = CLOCKS_PER_SEC/UPDATES_PER_SECOND + clock();
 		while (goal > clock());
-		for(int i=0; i<5; ++i) fputs("\033[A\033[2K",stdout); //clear lines
+        int num_lines_to_delete = 5;
+            if(debug_mode) ++num_lines_to_delete;
+		for(int i=0; i<num_lines_to_delete; ++i) fputs("\033[A\033[2K",stdout); //clear lines
 		configIO = 0;
 	}
 
