@@ -65,7 +65,7 @@ int main(int argc, char** argv)
     bool disp_fraction = false;
     bool recalculate = false;
 
-    while ((c = getopt(argc, argv, ":tpvf")) != -1) {
+    while ((c = getopt(argc, argv, ":tpvfr")) != -1) {
     switch(c) {
         case 't':
             disp_temperature = true;
@@ -137,6 +137,7 @@ int main(int argc, char** argv)
 
     if(recalculate)
     {
+        printf("Recalculating temperature and pressure\n");
         for(int i=0; i<n; ++i)
         {
             for(int j=0; j<NUM_RTDS; ++j)
@@ -258,9 +259,9 @@ int main(int argc, char** argv)
     pID = fork();
     if(pID==0)
     {
-        printf("executing root command\n");
+        printf("Initializing root. This may take a moment.\n");
         system(root_command);
-        printf("root command executed\n");
+        printf("Root terminated.\n");
         exit(0);
     }
     return 0;

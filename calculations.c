@@ -40,7 +40,8 @@ double resistance(double voltage, int channel)
 
 double temperature(double voltage, int channel)
 {
-    double t0 = 23.0+CELCIUS_TO_KELVIN; //room temperature
+//    double t0 = 23.0+CELCIUS_TO_KELVIN; //room temperature
+    double t0 = 23.0 + 264.15;
     double t1 = 77.0; //liquid nitrogen
     double v0,v1;
     switch(channel)
