@@ -8,6 +8,41 @@ static bool calibration_data_is_loaded = false;
 
 static const char* CALIBRATION_DATA_FILE_NAME = "calibration_data";
 
+//Output should be in kelvin. Always do everythingin kelvin.
+double temperature(double voltage, int channel)
+{
+    if(!calibration_data_is_loaded)
+        load_calibration_data();
+    /*
+     * t is temperature
+     * r is resistance
+     */
+    double r = resistance(voltage, channel);
+    if(r <= calibration_resistances[0])
+        return 0; //error value
+    if(r >= calibration_resistances[calibration_n-2])
+        return 1000; //error value
+
+    /*
+     * The following search is inefficient, specifically O(n) time
+     * But it should only deal with a list of 80 values and I do
+     * not want to debug a more complicated search algorithm
+     */
+    int floor_index = 0;
+    while(r < calibration_resistances[floor_index])
+        ++floor_index;
+    double r0 = calibration_resistances[floor_index];
+    double r1 = calibration_resistances[floor_index+1];
+    double t0 = calibration_temperatures[floor_index];
+    double t1 = calibration_temperatures[floor_index+1];
+
+    /*
+     * Local linear fit
+     */
+    double t = t0 + (r-r0)*(t1-t0)/(r1-r0);
+    return t;
+}
+
 void load_calibration_data()
 {
     //count the lines
@@ -40,9 +75,6 @@ void load_calibration_data()
         ++calibration_n;
     }
     calibration_data_is_loaded = true;
-    //testing
-    printf("calibration_n is %d\n", calibration_n);
-    printf("#lines is %d\n", lines);
 }
 
 
@@ -82,26 +114,6 @@ double resistance(double voltage, int channel)
         break;
     }
     return (voltage-0.005)*100.0/2.400+18.0;
-}
-
-
-//Output should be in kelvin. Always do everythingin kelvin.
-double temperature(double voltage, int channel)
-{
-    if(!calibration_data_is_loaded)
-    {
-        load_calibration_data();
-    }
-    //resistance = 100 ohm at 173.15 K. Changes by 0.385 ohms per degree.
-    /*
-     * t is temperature
-     * r is resistance
-     */
-    double r = resistance(voltage, channel);
-    double delta_r = r - 100;
-    double delta_t = delta_r / 0.385;
-    double t = 273.15 + delta_t;
-    return t;
 }
 
 //Here we will recalculate pressure from actual values
