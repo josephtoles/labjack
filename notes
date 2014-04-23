@@ -17,4 +17,5 @@ Calibrate pressure sensor with a voltage generator
 When exactly 2V is put into the box, 50.3PSI comes out of the terminal. This is probably because the box needs some calibration.
 
 
-
+1.000V on multimeter is 0PSI
+2.000V on multimeter is 50PSI

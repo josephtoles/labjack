@@ -20,6 +20,7 @@ const int TEMP_MARKER_COLORS[4] = {2, 3, 4, 28};
 // -v display voltages
 // -t display temperatures
 // -p display pressures
+// -o display resistance (always calculated, never from file)
 // -f display fraction of pressure/temperature
 // -r recalculate all data from voltages (use this when a new equation has been implemented)
 //        Note: doing so does not alter the original file
@@ -32,6 +33,7 @@ struct sample
     char timestamp[10];
     double rtd[4];
     double rtd_v[4];
+    double rtd_r[4]; //resistance
     double pressure;
     double pressure_v;
 };
@@ -63,9 +65,10 @@ int main(int argc, char** argv)
     bool disp_pressure = false;
     bool disp_voltage = false;
     bool disp_fraction = false;
+    bool disp_resistance = false;
     bool recalculate = false;
 
-    while ((c = getopt(argc, argv, ":tpvfr")) != -1) {
+    while ((c = getopt(argc, argv, ":otpvfr")) != -1) {
     switch(c) {
         case 't':
             disp_temperature = true;
@@ -82,13 +85,16 @@ int main(int argc, char** argv)
         case 'r':
             recalculate = true;
             break;
+        case 'o':
+            disp_resistance = true;
+            break;
         case '?':
             printf("unknown arg %c\n", optopt);
             break;
         }
     }
     //Default no options setting
-    if(!disp_temperature && !disp_pressure && !disp_fraction)
+    if(!disp_temperature && !disp_pressure && !disp_fraction && !disp_resistance)
         disp_temperature = true;
 
     FILE* f = fopen(file_name, "r");
@@ -130,6 +136,8 @@ int main(int argc, char** argv)
             &s.pressure,
             s.rtd_v, s.rtd_v+1, s.rtd_v+2, s.rtd_v+3,
             &s.pressure_v);
+        for(int i=0; i<NUM_RTDS; ++i)
+            s.rtd_r[i] = resistance(s.rtd_v[i], i);
         samples[n] = s;
         ++n;
     }
@@ -159,7 +167,7 @@ int main(int argc, char** argv)
 
     //input arrays here
     fprintf(f, "const Int_t n = %d;\n", n);
-    if(disp_temperature)
+    if(disp_temperature || disp_resistance)
     {
         for(int i=0; i<NUM_RTDS; ++i)
         {
@@ -178,6 +186,8 @@ int main(int argc, char** argv)
             {
                 if(disp_voltage)
                     fprintf(f, "%f", samples[j].rtd_v[i]);
+                else if(disp_resistance)
+                    fprintf(f, "%f", samples[j].rtd_r[i]);
                 else
                     fprintf(f, "%f", samples[j].rtd[i]);
                 if(j!=n-1)

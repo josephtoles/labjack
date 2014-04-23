@@ -1,4 +1,5 @@
 #include "main.h"
+#include "calculations.h"
 
 double resistance(double voltage, int channel)
 {
@@ -38,36 +39,22 @@ double resistance(double voltage, int channel)
     return (voltage-0.005)*100.0/2.400+18.0;
 }
 
+//Output should be in kelvin. Always do everythingin kelvin.
 double temperature(double voltage, int channel)
 {
-//    double t0 = 23.0+CELCIUS_TO_KELVIN; //room temperature
-    double t0 = 23.0 + 264.15;
-    double t1 = 77.0; //liquid nitrogen
-    double v0,v1;
-    switch(channel)
-    {
-    case 0:;
-        v0 = 2.011;
-        v1 = 0.080;
-        return (voltage-v0)*(t1-t0)/(v1-v0)+t0;
-    case 1:;
-        v0 = 2.011;
-        v1 = 0.100;
-        return (voltage-v0)*(t1-t0)/(v1-v0)+t0;
-    case 2:; 
-        v0 = 2.125;
-        v1 = 0.115;
-        return (voltage-v0)*(t1-t0)/(v1-v0)+t0;
-    case 3:;
-        v0 = 2.122;
-        v1 = 0.120;
-        return (voltage-v0)*(t1-t0)/(v1-v0)+t0;
-    default:
-        break;
-    }
-    return 0;
+    //resistance = 100 ohm at 173.15 K. Changes by 0.385 ohms per degree.
+    /*
+     * t is temperature
+     * r is resistance
+     */
+    double r = resistance(voltage, channel);
+    double delta_r = r - 100;
+    double delta_t = delta_r / 0.385;
+    double t = 273.15 + delta_t;
+    return t;
 }
-    
+
+/*
 //Both pressure and voltage start at zero here, after counting the offset
 const double PRESSURE_VOLTAGE_OFFSET = 0.010;
 const double VOLTAGE_RANGE = 2.4;
@@ -76,4 +63,14 @@ double pressure(double voltage)
 {
     return PRESSURE_RANGE*((voltage-PRESSURE_VOLTAGE_OFFSET)/VOLTAGE_RANGE);
 }
+*/
 
+//Here we will recalculate pressure from actual values
+double pressure(double voltage)
+{
+    double p0 = 0.0;
+    double v0 = 0.015;
+    double p1 = 15.0;
+    double v1 = 0.192;
+    return (voltage-v0)*(p1-p0)/(v1-v0)+p0;
+}

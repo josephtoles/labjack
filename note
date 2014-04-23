@@ -1,0 +1,1 @@
+Note: In elog graphs, wrong calcius-to-kelvin constant was used in "calculations.c" temperature function. Number was off by about 10 degrees. This may have damaged results.
