@@ -145,7 +145,6 @@ int main(int argc, char** argv)
 
     if(recalculate)
     {
-        printf("Recalculating temperature and pressure\n");
         for(int i=0; i<n; ++i)
         {
             for(int j=0; j<NUM_RTDS; ++j)

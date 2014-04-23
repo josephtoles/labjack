@@ -1,6 +1,51 @@
 #include "main.h"
 #include "calculations.h"
 
+static double* calibration_temperatures;
+static double* calibration_resistances;
+static int calibration_n = 0;
+static bool calibration_data_is_loaded = false;
+
+static const char* CALIBRATION_DATA_FILE_NAME = "calibration_data";
+
+void load_calibration_data()
+{
+    //count the lines
+    FILE* f = fopen(CALIBRATION_DATA_FILE_NAME, "r");
+    if(f == NULL)
+    {
+        printf("Could not open file %s.\n", CALIBRATION_DATA_FILE_NAME);
+        exit(-1);
+    }
+    int lines = 0;
+    while(!feof(f))
+    {
+        char ch = getc(f);
+        if (ch=='\n')
+            ++lines;
+    }
+    fclose(f);
+
+    calibration_temperatures = (double*)malloc(sizeof(double)*lines);
+    calibration_resistances = (double*)malloc(sizeof(double)*lines);
+
+    f = fopen(CALIBRATION_DATA_FILE_NAME, "r");
+ 
+    while(!feof(f))
+    {
+        fscanf(f,
+            "%lf %lf",
+            calibration_temperatures + calibration_n,
+            calibration_resistances + calibration_n);
+        ++calibration_n;
+    }
+    calibration_data_is_loaded = true;
+    //testing
+    printf("calibration_n is %d\n", calibration_n);
+    printf("#lines is %d\n", lines);
+}
+
+
 double resistance(double voltage, int channel)
 {
     //are these the voltages including or not including the cable?
@@ -39,9 +84,14 @@ double resistance(double voltage, int channel)
     return (voltage-0.005)*100.0/2.400+18.0;
 }
 
+
 //Output should be in kelvin. Always do everythingin kelvin.
 double temperature(double voltage, int channel)
 {
+    if(!calibration_data_is_loaded)
+    {
+        load_calibration_data();
+    }
     //resistance = 100 ohm at 173.15 K. Changes by 0.385 ohms per degree.
     /*
      * t is temperature
@@ -53,17 +103,6 @@ double temperature(double voltage, int channel)
     double t = 273.15 + delta_t;
     return t;
 }
-
-/*
-//Both pressure and voltage start at zero here, after counting the offset
-const double PRESSURE_VOLTAGE_OFFSET = 0.010;
-const double VOLTAGE_RANGE = 2.4;
-const double PRESSURE_RANGE = 200.0; //(PSI)
-double pressure(double voltage)
-{
-    return PRESSURE_RANGE*((voltage-PRESSURE_VOLTAGE_OFFSET)/VOLTAGE_RANGE);
-}
-*/
 
 //Here we will recalculate pressure from actual values
 double pressure(double voltage)
