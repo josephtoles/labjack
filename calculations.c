@@ -29,8 +29,9 @@ double temperature(double voltage, int channel)
      * not want to debug a more complicated search algorithm
      */
     int floor_index = 0;
-    while(r < calibration_resistances[floor_index])
+    while(r > calibration_resistances[floor_index])
         ++floor_index;
+    --floor_index;
     double r0 = calibration_resistances[floor_index];
     double r1 = calibration_resistances[floor_index+1];
     double t0 = calibration_temperatures[floor_index];

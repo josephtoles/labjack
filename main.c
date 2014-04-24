@@ -2,7 +2,7 @@
 
 //CONSTANTS
 const int UPDATES_PER_SECOND = 10;
-const int DISC_SAVE_DELAY = 2; //seconds (Use 2 for testing, 60 for production)
+const int DISC_SAVE_DELAY = 60; //seconds (Use 2 for testing, 60 for production)
 const int GRAPH_REFRESH_DELAY = 60; //seconds (Use 10 for testing, 60 for production. Do not lower much below 7.)
 const int GRAPH_POINT_SAVE_DELAY = 60; //seconds
 const time_t PRESSURE_REFRESH_EPSILON = 50; //clock_t
