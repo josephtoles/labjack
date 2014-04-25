@@ -8,6 +8,7 @@ Email: jbtoles@gmail.com
 | Sections             |
 +——————————————————————+
 1. Install drivers
+2. Using "main"
 2. Notes
 
 
@@ -24,69 +25,29 @@ Once you have installed the drivers, go into exodriver-master’s “examples/u3
 
 
 +——————————————————————+
+| 2  USING MAIN        |
++——————————————————————+
+To run the standard program ented
+$ ./main
+This will display the present temperature, pressure and other information along with a graph.
+To suppress the graph, pass the "-t" flag to main. Main will always create a log of the information it records. This log is saved in the logs folder with the current timestamp as its name.
+These logs are written in plain text format and so can be examined with a standard text viewer, however it is easier to view them visually. To do so, use the plot program. For example
+$ ./plot logs/2014-04-11_17:17:12
+will display a graph of the temperatures in the 2014-04-11_17:17:12 log.
+Temperature is the default. Passing a "-p" flag will display pressure instead. passing "-vt" will display the raw voltages of the RTDs instead of temperatures. "-vp" will display the raw voltage of the barometer instead. As the system has evolved, the equations to calculate pressure and temperature form voltage have changed. This means that in viewing some old data, temperature and pressure may need to be recalculated. To do this, pass the "-r" flag.
+There are two more flags. "-f" displays the fraction of pressure divided by temperature. "-o" dosplays the resistance of the RTDs calculated from the voltages in the file.
+
+
+
++——————————————————————+
 | 2  MISC NOTES        |
 +——————————————————————+
-This section lists useful information.
-
 The U3 Labjack manual can be found at
 http://labjack.com/support/u3
 
-Information on temperature coefficients can be foudn at
-http://en.wikipedia.org/wiki/Temperature_coefficient
-	R(T)  = R(T_0)(1+alpha(T_1-T_0))
-	T_0   = 100 ohms @ 0°C
-	alpha = 0.00385 °C^-1
-The LabJack does not actually read voltages at 0.000V. It only goes down to 0.003V. So I will use and idealized range of
-
-The pressure sensor we use is of the following make
-	SSI Technologies Inc
-	P51-200-A-E-I36-5V-000-000
-Information on the pressure sensor can be found at
-http://www.digikey.com/product-detail/en/P51-200-A-E-I36-5V-000-000/734-1184-ND/1720107
-
-
-
-CALIBRATION NOTES
-
-0.000V at 18 ohms
-and
-2.400V at 118 ohms
-
-This means that Voltage = 0.005V + 2.400V(resistance-18)/100
-
-But the actual test resistances I'm using are 116.0 (varies between 115.9 and 116.2 ohms) and 18.0 (varies between 17.8 and 18.3) ohms
-so the voltages I should look for are
-
-0.005V at 18.0 ohms
-and
-2.357V at 116.0 ohms
-
-0.072V at 20.8 ohm
-1.740 V at 90.3 ohm
-
-voltage = 2.400*(resistance-18)/100+.005
-
-8  ohm resistor is actually  7.4 ohms
-18 ohm resistor is actually 20.8 ohms
-90 ohm resistor is actually 90.3 ohms
-
-
-
-
-Channel 0:
-	0.092V at 20.8ohm
-	1.796V at 90.3ohm
-	v0 = 0.092
-	r0 = 20.8
-	v1 = 1.796
-	r1 = 90.3
-
-
-
+After building the binary, you must run "do-suid" as sudo user. This give main the permissions necessary to access USB ports.
 If you get the error
    "libusb error: LIBUSB_ERROR_ACCESS
     Open error: could not find a U3 with a local ID or serial number of -1
     error: could not open USB connection."
 It is very likely because you did not give main the proper permissions. Run "do-suid" as sudo user to set these.
-
-
