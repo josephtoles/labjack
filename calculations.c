@@ -110,7 +110,9 @@ double resistance(double voltage, int channel)
         r0 = 21.0;
         v1 = 1.977;
         r1 = 98.6;
-        return (voltage-v0)*(r1-r0)/(v1-v0)+r0;
+        //The "-4.0" is because this RTD is attached to a longer wire which adds resistance
+        //The equation here is to calculate resistance of the RTD, not resistance read out of the chamber
+        return (voltage-v0)*(r1-r0)/(v1-v0)+r0-4.0;
     default:
         break;
     }
